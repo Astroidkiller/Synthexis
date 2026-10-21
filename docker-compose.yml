@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  synthexis-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: synthexis-backend-api
+    command: uvicorn main_api:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - CHROMA_PERSIST_DIR=/app/data/chromadb
+      - UPLOAD_DIR=/app/data/uploads
+      - EXTRACTED_IMAGES_DIR=/app/data/extracted_images
+    volumes:
+      - .:/app
+      - synthexis-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  synthexis-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: synthexis-frontend-ui
+    command: streamlit run app.py --server.port=8501 --server.address=0.0.0.0 --server.headless=true
+    ports:
+      - "8501:8501"
+    environment:
+      - SYNTHEXIS_API_URL=http://synthexis-api:8000
+    volumes:
+      - .:/app
+    depends_on:
+      synthexis-api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  synthexis-data:

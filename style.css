@@ -1,0 +1,350 @@
+/* ==============================================================================
+   Project Synthexis - Minimalist Clean Theme
+   Monochrome, crisp borders, high-contrast, distraction-free aesthetic.
+   ============================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* --- Root Color Tokens --- */
+:root {
+  --bg-page: #ffffff;
+  --bg-subtle: #f8fafc;
+  --bg-card: #ffffff;
+  --border-color: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-faint: #94a3b8;
+  --accent-black: #0f172a;
+  --accent-hover: #1e293b;
+  --badge-bg: #f1f5f9;
+  --success-color: #16a34a;
+  --danger-color: #dc2626;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+/* --- Global Background & Typography --- */
+html, body, [data-testid="stAppViewContainer"], [data-testid="stAppViewBlockContainer"] {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  background-color: var(--bg-page) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Clean Minimal Header */
+header[data-testid="stHeader"] {
+  background: #ffffff !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+/* --- Sidebar Styling --- */
+section[data-testid="stSidebar"] {
+  background: var(--bg-subtle) !important;
+  border-right: 1px solid var(--border-color) !important;
+}
+
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3,
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] label {
+  color: var(--text-primary) !important;
+}
+
+/* --- Headings --- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  letter-spacing: -0.02em !important;
+}
+
+p, span, label, div {
+  color: var(--text-secondary);
+}
+
+/* --- Clean Hero Banner --- */
+.hero-minimal-banner {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.hero-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem 0;
+  letter-spacing: -0.03em;
+}
+
+.hero-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* --- Metric Tiles --- */
+.metric-tile {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.metric-tile-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.metric-tile-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+/* --- Minimalist Status Badge --- */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.dot-online {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--success-color);
+  display: inline-block;
+}
+
+.dot-offline {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--danger-color);
+  display: inline-block;
+}
+
+/* --- Streamlit Tab Styling --- */
+.stTabs [data-baseweb="tab-list"] {
+  background-color: #f1f5f9 !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 4px !important;
+  gap: 4px !important;
+}
+
+.stTabs [data-baseweb="tab"] {
+  height: 38px !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--text-muted) !important;
+  font-weight: 500 !important;
+  font-size: 0.88rem !important;
+  border: none !important;
+  background-color: transparent !important;
+  padding: 0 1.15rem !important;
+  transition: all 0.15s ease !important;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+  color: var(--text-primary) !important;
+}
+
+.stTabs [aria-selected="true"] {
+  background-color: #ffffff !important;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  border: none !important;
+}
+
+.stTabs [data-baseweb="tab-highlight"] {
+  display: none !important;
+}
+
+/* --- Buttons --- */
+.stButton > button {
+  background: var(--accent-black) !important;
+  color: #ffffff !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 0.88rem !important;
+  border: 1px solid var(--accent-black) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 0.5rem 1.25rem !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.15s ease !important;
+}
+
+.stButton > button:hover {
+  background: var(--accent-hover) !important;
+  border-color: var(--accent-hover) !important;
+  color: #ffffff !important;
+}
+
+.stButton > button:active {
+  transform: translateY(1px) !important;
+}
+
+/* Secondary Button */
+div[data-testid="stButton"] > button[kind="secondary"],
+div[data-testid="stButton"] > button[data-testid="baseButton-secondary"],
+button[data-testid="stBaseButton-secondary"] {
+  background: #ffffff !important;
+  border: 1px solid var(--border-strong) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+}
+
+div[data-testid="stButton"] > button[kind="secondary"]:hover,
+div[data-testid="stButton"] > button[data-testid="baseButton-secondary"]:hover,
+button[data-testid="stBaseButton-secondary"]:hover {
+  background: #f8fafc !important;
+  border-color: var(--accent-black) !important;
+}
+
+/* --- Form Inputs & Text Areas --- */
+div[data-baseweb="input"] > div,
+div[data-baseweb="textarea"] > div,
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea {
+  background-color: #ffffff !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+}
+
+div[data-baseweb="input"] > div:focus-within,
+div[data-baseweb="textarea"] > div:focus-within,
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus {
+  border-color: var(--accent-black) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px var(--accent-black) !important;
+}
+
+/* --- File Uploader --- */
+div[data-testid="stFileUploader"] {
+  background: var(--bg-subtle) !important;
+  border: 1px dashed var(--border-strong) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 1.25rem !important;
+}
+
+div[data-testid="stFileUploader"]:hover {
+  border-color: var(--accent-black) !important;
+}
+
+div[data-testid="stFileUploader"] section {
+  background: transparent !important;
+}
+
+/* --- Expanders --- */
+div[data-testid="stExpander"] {
+  background: #ffffff !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+  margin-bottom: 0.75rem !important;
+}
+
+div[data-testid="stExpander"]:hover {
+  border-color: var(--border-strong) !important;
+}
+
+/* --- Code & Monospace --- */
+code, pre {
+  font-family: 'JetBrains Mono', monospace !important;
+  background: #f1f5f9 !important;
+  color: var(--text-primary) !important;
+  border-radius: 4px !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* --- Synthesis Answer Box --- */
+.synthesis-result-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  line-height: 1.75;
+  color: var(--text-primary);
+  margin-top: 1rem;
+}
+
+.synthesis-result-card h1,
+.synthesis-result-card h2,
+.synthesis-result-card h3 {
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.35rem;
+  margin-top: 1.25rem;
+}
+
+/* --- Source Chunk Card --- */
+.source-chunk-card {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* --- Visual Artifact Card --- */
+.visual-artifact-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+  text-align: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+/* --- Clean Badge --- */
+.clean-badge {
+  display: inline-block;
+  background: #f1f5f9;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+/* Clean Document Card */
+.doc-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Environment Variables
+.env
+.env.local
+
+# Storage and Artifacts
+data/
+data/uploads/
+data/chromadb/
+data/extracted_images/
+chroma_db/
+*.pdf
+
+# Streamlit
+.streamlit/
+*.log
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
