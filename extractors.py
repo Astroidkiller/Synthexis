@@ -21,6 +21,8 @@ I/O Contract:
 =============================================================================
 """
 
+from __future__ import annotations
+
 import os
 import re
 import io
@@ -32,25 +34,28 @@ from typing import List, Dict, Any, Optional, Tuple, Union
 logger = logging.getLogger("synthexis.extractors")
 
 # ---------------------------------------------------------------------------
-# Core Dependencies
+# Core Dependencies with Defensive Fallbacks
 # ---------------------------------------------------------------------------
 try:
     import fitz  # PyMuPDF
     PYMUPDF_AVAILABLE = True
 except ImportError:
+    fitz = None
     PYMUPDF_AVAILABLE = False
-    logger.error("PyMuPDF (fitz) is required for visual extraction. Install via: pip install PyMuPDF")
+    logger.warning("PyMuPDF (fitz) is required for visual extraction. Install via: pip install PyMuPDF")
 
 try:
     import pdfplumber
     PDFPLUMBER_AVAILABLE = True
 except ImportError:
+    pdfplumber = None
     PDFPLUMBER_AVAILABLE = False
 
 try:
     from PIL import Image
     PILLOW_AVAILABLE = True
 except ImportError:
+    Image = None
     PILLOW_AVAILABLE = False
 
 try:
@@ -61,6 +66,7 @@ except ImportError:
         from langchain.text_splitter import RecursiveCharacterTextSplitter
         LANGCHAIN_SPLITTER_AVAILABLE = True
     except ImportError:
+        RecursiveCharacterTextSplitter = None
         LANGCHAIN_SPLITTER_AVAILABLE = False
 
 
@@ -86,9 +92,9 @@ class VisualArtifact:
         return io.BytesIO(self.bytes)
 
 
-def _merge_rects(rects: List[fitz.Rect], padding: float = 10.0) -> List[fitz.Rect]:
+def _merge_rects(rects: List[Any], padding: float = 10.0) -> List[Any]:
     """Merges overlapping or closely clustered bounding boxes (e.g., chart components)."""
-    if not rects:
+    if not rects or not PYMUPDF_AVAILABLE:
         return []
 
     merged = []
@@ -242,7 +248,7 @@ def format_table_as_markdown(table_rows: List[List[Optional[str]]]) -> str:
 def extract_tables_as_markdown(file_path: str) -> Dict[int, List[str]]:
     """Extracts tables as Markdown text per page."""
     tables_by_page: Dict[int, List[str]] = {}
-    if PDFPLUMBER_AVAILABLE:
+    if PDFPLUMBER_AVAILABLE and pdfplumber is not None:
         try:
             with pdfplumber.open(file_path) as pdf:
                 for idx, page in enumerate(pdf.pages):
@@ -257,7 +263,7 @@ def extract_tables_as_markdown(file_path: str) -> Dict[int, List[str]]:
         except Exception:
             pass
 
-    if PYMUPDF_AVAILABLE:
+    if PYMUPDF_AVAILABLE and fitz is not None:
         try:
             doc = fitz.open(file_path)
             for idx, page in enumerate(doc):
@@ -296,7 +302,7 @@ def chunk_document_text(
     chunk_overlap: int = 150
 ) -> List[str]:
     """Chunks text preserving citation tags: [filename | Page N]."""
-    if LANGCHAIN_SPLITTER_AVAILABLE:
+    if LANGCHAIN_SPLITTER_AVAILABLE and RecursiveCharacterTextSplitter is not None:
         splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
@@ -312,7 +318,7 @@ def chunk_document_text(
         if splitter:
             splits = splitter.split_text(content)
         else:
-            splits = [content[i:i+chunk_size] for i in range(0, len(content), chunk_size - chunk_overlap)]
+            splits = [content[i:i+chunk_size] for i in range(0, len(content), max(1, chunk_size - chunk_overlap))]
 
         for s in splits:
             s_clean = s.strip()
@@ -356,16 +362,31 @@ def process_document(
 
     # 2. Extract plain text page-by-page and inject table markdown
     pages_data: List[Tuple[int, str]] = []
-    if PYMUPDF_AVAILABLE:
-        doc = fitz.open(str(path_obj))
-        for idx, page in enumerate(doc):
-            p_num = idx + 1
-            raw_text = clean_text(page.get_text("text") or "")
-            if p_num in tables_by_page:
-                raw_text += "\n\n### Extracted Table:\n" + "\n".join(tables_by_page[p_num])
-            if raw_text.strip():
-                pages_data.append((p_num, raw_text))
-        doc.close()
+    if PYMUPDF_AVAILABLE and fitz is not None:
+        try:
+            doc = fitz.open(str(path_obj))
+            for idx, page in enumerate(doc):
+                p_num = idx + 1
+                raw_text = clean_text(page.get_text("text") or "")
+                if p_num in tables_by_page:
+                    raw_text += "\n\n### Extracted Table:\n" + "\n".join(tables_by_page[p_num])
+                if raw_text.strip():
+                    pages_data.append((p_num, raw_text))
+            doc.close()
+        except Exception as e:
+            logger.error(f"Error reading PDF text with PyMuPDF: {e}")
+
+    # Fallback to pdfplumber text if PyMuPDF wasn't available
+    if not pages_data and PDFPLUMBER_AVAILABLE and pdfplumber is not None:
+        try:
+            with pdfplumber.open(str(path_obj)) as pdf:
+                for idx, page in enumerate(pdf.pages):
+                    p_num = idx + 1
+                    raw_text = clean_text(page.extract_text() or "")
+                    if raw_text.strip():
+                        pages_data.append((p_num, raw_text))
+        except Exception as e:
+            logger.error(f"Error reading PDF text with pdfplumber: {e}")
 
     # 3. Text chunking using LangChain
     text_chunks = chunk_document_text(pages_data, filename=filename)
