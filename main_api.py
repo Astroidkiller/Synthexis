@@ -255,15 +255,9 @@ def mock_llm_synthesis(query: str, context: List[str], images: List[Any] = None)
 # API ROUTING ENDPOINTS
 # ==============================================================================
 @app.get("/", tags=["UI"], include_in_schema=False)
-def serve_index(request: Request, view: Optional[str] = None):
-    user_agent = request.headers.get("user-agent", "").lower()
-    is_mobile = any(dev in user_agent for dev in ["mobile", "android", "iphone", "ipad"])
-    
-    if view == "mobile" or (is_mobile and view != "desktop"):
-        mobile_file = BASE_DIR / "mobile.html"
-        if mobile_file.exists():
-            return FileResponse(str(mobile_file))
-
+@app.get("/app", tags=["UI"], include_in_schema=False)
+@app.get("/mobile", tags=["UI"], include_in_schema=False)
+def serve_index():
     index_file = BASE_DIR / "index.html"
     if index_file.exists():
         return FileResponse(str(index_file))
@@ -273,20 +267,6 @@ def serve_index(request: Request, view: Optional[str] = None):
         "status": "Operational",
         "docs_url": "/docs"
     }
-
-@app.get("/mobile", tags=["UI"], include_in_schema=False)
-def serve_mobile_ui():
-    mobile_file = BASE_DIR / "mobile.html"
-    if mobile_file.exists():
-        return FileResponse(str(mobile_file))
-    index_file = BASE_DIR / "index.html"
-    if index_file.exists():
-        return FileResponse(str(index_file))
-    return {"message": "Mobile UI template not found"}
-
-@app.get("/app", tags=["UI"], include_in_schema=False)
-def serve_app_alias(request: Request, view: Optional[str] = None):
-    return serve_index(request, view=view)
 
 @app.get("/api/info", tags=["Health"])
 def root():

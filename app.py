@@ -41,17 +41,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 APP_DIR = Path(__file__).resolve().parent
-
-# Check query parameter for view toggle (?view=mobile or ?view=desktop)
-view_mode = st.query_params.get("view", "desktop")
-target_file = (APP_DIR / "mobile.html") if view_mode == "mobile" else (APP_DIR / "index.html")
-
-if not target_file.exists():
-    target_file = APP_DIR / "index.html"
+target_file = APP_DIR / "index.html"
 
 if target_file.exists():
     with open(target_file, "r", encoding="utf-8") as f:
         html_code = f.read()
     components.html(html_code, height=980, scrolling=True)
 else:
-    st.error("Dashboard templates not found. Please ensure index.html or mobile.html exists.")
+    st.error("Dashboard template index.html not found.")
