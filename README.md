@@ -21,6 +21,7 @@
 - [Running the Platform](#-running-the-platform)
 - [REST API Reference](#-rest-api-reference)
 - [User Interface](#-user-interface)
+- [Security & Hardening](#-security--hardening)
 - [Important Remarks & AI Disclaimer](#-important-remarks--ai-disclaimer)
 - [License](#-license)
 
@@ -278,6 +279,32 @@ The Synthexis user interface provides a unified, fluid workspace:
 - **Spotlight Search (`⌘K` / `Ctrl+K`)**: Rapid in-memory search across syntheses, indexed documents, and chunk evidence.
 - **Interactive Document Vault**: Drag-and-drop document ingestion with real-time indexing status and inventory management.
 - **Evidence Drawer & Citations**: Interactive inline citation pills (`[C1]`, `[V1]`) that trigger slide-over inspector views with exact source snippets and visual artifact figures.
+
+---
+
+## 🛡️ Security & Hardening
+
+Synthexis is built with defense-in-depth principles to protect against common web vulnerabilities, denial of service, and LLM-specific attack vectors:
+
+- **Rate Limiting & DoS Defense**: A thread-safe, in-memory sliding-window rate limiter tracks requests per client IP:
+  - `/api/upload`: Max 15 requests per 60-second window.
+  - `/api/query`: Max 30 requests per 60-second window.
+  - Exceeded limits trigger `HTTP 429 Too Many Requests` with a dynamic `Retry-After` header.
+- **SQL Injection Immunity & Query Sanitization**:
+  - The storage layer utilizes ChromaDB (vector embeddings over HNSW) and BM25 (in-memory inverted index), eliminating raw relational SQL queries (`SELECT`, `DROP`, `UNION`).
+  - All incoming query payloads undergo strict Pydantic length constraints (`1-4000` chars), non-printable/null-byte stripping, script tag removal, and proactive regex neutralization of SQL injection keywords (`UNION SELECT`, `DROP TABLE`, `' OR 1=1 --`).
+- **Path Traversal Defense**:
+  - Uploaded filenames are sanitized by stripping directory path tokens (`../`, `..\`) and replacing non-alphanumeric characters.
+  - Absolute file paths are verified using Python's `Path.resolve()` to ensure files can never escape the designated `data/uploads/` directory.
+- **File Upload Protection & Magic Byte Verification**:
+  - Uploads are capped at a maximum of 25 MB per file and 10 files per request batch.
+  - Files are validated using strict binary magic-byte inspection (`b"%PDF-"`) to prevent masked executables or malicious binary scripts from entering the ingestion pipeline.
+- **OWASP HTTP Security Headers**:
+  - Every API response includes defensive HTTP headers: `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `X-XSS-Protection: 1; mode=block`, and `Referrer-Policy: strict-origin-when-cross-origin`.
+  - CORS methods are explicitly restricted to `["GET", "POST", "DELETE", "OPTIONS"]`.
+- **Indirect Prompt Injection Guardrails**:
+  - Retrieved document context chunks are isolated inside `<evidence_corpus>` XML boundary tags within the LLM prompt.
+  - The synthesis agent is explicitly instructed to treat all retrieved evidence strictly as untrusted, passive reference material and never execute instructions or directives embedded within uploaded documents.
 
 ---
 

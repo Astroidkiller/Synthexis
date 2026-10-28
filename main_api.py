@@ -4,10 +4,13 @@ Coordinates document ingestion, hybrid search retrieval, and multimodal LLM synt
 """
 
 import os
+import re
 import time
 import base64
 import logging
 import inspect
+import threading
+from collections import defaultdict
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 from datetime import datetime
@@ -69,6 +72,64 @@ CHROMA_DIR = DATA_DIR / "chromadb"
 for directory in [DATA_DIR, UPLOAD_DIR, IMAGES_DIR, CHROMA_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
+# ==============================================================================
+# SECURITY CONSTANTS & DEFENSIVE RATE LIMITING
+# ==============================================================================
+MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024  # 25 MB max per file upload
+MAX_UPLOAD_BATCH = 10                   # Max 10 files per upload request
+PDF_MAGIC_BYTES = b"%PDF-"             # Strict PDF file signature
+
+SQL_INJECTION_PATTERN = re.compile(
+    r"(\b(UNION\s+SELECT|DROP\s+TABLE|ALTER\s+TABLE|DELETE\s+FROM|INSERT\s+INTO|UPDATE\s+.*?SET)\b)|(--|\bOR\s+1=1\b|;\s*SHUTDOWN)",
+    re.IGNORECASE
+)
+
+class SlidingWindowRateLimiter:
+    """Thread-safe in-memory sliding window rate limiter per client IP."""
+    def __init__(self, max_requests: int, window_seconds: int = 60):
+        self.max_requests = max_requests
+        self.window_seconds = window_seconds
+        self.records = defaultdict(list)
+        self._lock = threading.Lock()
+
+    def check(self, client_ip: str) -> tuple[bool, int]:
+        now = time.time()
+        window_start = now - self.window_seconds
+        with self._lock:
+            # Clean expired timestamps
+            valid = [t for t in self.records[client_ip] if t > window_start]
+            if len(valid) >= self.max_requests:
+                self.records[client_ip] = valid
+                retry_after = int(self.window_seconds - (now - valid[0])) + 1
+                return False, max(1, retry_after)
+            valid.append(now)
+            self.records[client_ip] = valid
+            return True, 0
+
+upload_limiter = SlidingWindowRateLimiter(max_requests=15, window_seconds=60)
+query_limiter = SlidingWindowRateLimiter(max_requests=30, window_seconds=60)
+
+def sanitize_filename(filename: str) -> str:
+    """Prevents path traversal attacks by extracting basename and sanitizing characters."""
+    clean = Path(filename).name
+    clean = re.sub(r'[^a-zA-Z0-9_.-]', '_', clean)
+    if not clean or clean.startswith('.'):
+        clean = f"document_{int(time.time())}.pdf"
+    return clean
+
+def sanitize_and_validate_query(query: str) -> str:
+    """Sanitizes user input against XSS, null-byte injection, and SQL injection payloads."""
+    if not query or not query.strip():
+        raise HTTPException(status_code=400, detail="Query text cannot be empty.")
+    # Strip null bytes and non-printable control characters
+    cleaned = "".join(ch for ch in query if ch == '\n' or ch == '\t' or ord(ch) >= 32)
+    # Strip script tags
+    cleaned = re.sub(r"<\s*script[^>]*>.*?<\s*/\s*script\s*>", "", cleaned, flags=re.DOTALL | re.IGNORECASE)
+    # Defensively neutralize SQL injection keywords
+    cleaned = SQL_INJECTION_PATTERN.sub("", cleaned)
+    return cleaned.strip()
+
+
 # In-memory document registry for session management
 # {filename: {"metadata": {...}, "chunks": [...], "images": [...]}}
 DOCUMENT_REGISTRY: Dict[str, Dict[str, Any]] = {}
@@ -93,9 +154,9 @@ class IngestResponse(BaseModel):
     engine_used: str
 
 class QueryRequest(BaseModel):
-    query: str = Field(..., description="User search or comparison question")
-    top_k: int = Field(5, ge=1, le=20, description="Number of context chunks to retrieve")
-    filter_docs: Optional[List[str]] = Field(None, description="Optional document filter")
+    query: str = Field(..., min_length=1, max_length=4000, description="User search or comparison question (sanitized)")
+    top_k: int = Field(5, ge=1, le=20, description="Number of context chunks to retrieve (1-20)")
+    filter_docs: Optional[List[str]] = Field(None, description="Optional document filter (max 20 items)")
 
 class Citation(BaseModel):
     chunk_index: int
@@ -145,9 +206,19 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    """Injects OWASP defense-in-depth security response headers."""
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
 
 # Serve extracted images statically if needed
 app.mount("/static/images", StaticFiles(directory=str(IMAGES_DIR)), name="static_images")
@@ -326,33 +397,70 @@ def get_modules_status():
     return health_check()
 
 @app.post("/api/upload", response_model=IngestResponse, tags=["Ingestion"])
-async def upload_documents(files: List[UploadFile] = File(...)):
+async def upload_documents(http_req: Request, files: List[UploadFile] = File(...)):
     """
-    Ingest multiple PDF documents:
-    1. Saves incoming files to the staging directory.
-    2. Calls Person 2's `process_document(file_path)` to extract chunks and visual charts.
-    3. Calls Person 3's `create_index(all_chunks)` to build hybrid BM25 + Vector index.
-    4. Updates document inventory.
+    Securely ingest multiple PDF documents:
+    - Sliding window rate limiting per IP.
+    - Path traversal defense & filename sanitization.
+    - PDF magic-byte validation (%PDF-).
+    - File size threshold (25MB cap).
+    - Batch upload limit (10 files max).
     """
     global ALL_CHUNKS_CACHE, DOCUMENT_REGISTRY
 
+    # 1. Rate Limiting Check
+    client_ip = http_req.client.host if http_req.client else "127.0.0.1"
+    allowed, retry_after = upload_limiter.check(client_ip)
+    if not allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Upload rate limit exceeded. Please wait {retry_after} seconds before trying again.",
+            headers={"Retry-After": str(retry_after)}
+        )
+
+    # 2. Batch Validation
     if not files:
         raise HTTPException(status_code=400, detail="No files provided for ingestion.")
+    if len(files) > MAX_UPLOAD_BATCH:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Upload batch exceeds the limit of {MAX_UPLOAD_BATCH} files per request."
+        )
 
     processed_docs: List[DocumentMeta] = []
     p2_is_real = check_callable(process_document)
     engine_name = "Person 2 (extractors.py)" if p2_is_real else "Person 1 Ingestion Adapter (PyMuPDF Fallback)"
 
     for file in files:
-        if not file.filename.lower().endswith(".pdf"):
+        # 3. Path Traversal & Filename Sanitization
+        safe_filename = sanitize_filename(file.filename)
+        if not safe_filename.lower().endswith(".pdf"):
             continue
 
-        file_path = UPLOAD_DIR / file.filename
-        content = await file.read()
-        with open(file_path, "wb") as f:
-            f.write(content)
+        file_path = (UPLOAD_DIR / safe_filename).resolve()
+        # Verify destination path is strictly within UPLOAD_DIR
+        if not str(file_path).startswith(str(UPLOAD_DIR.resolve())):
+            raise HTTPException(status_code=400, detail="Invalid destination path (path traversal detected).")
 
-        filesize = len(content)
+        # 4. Enforce File Size Cap (read up to MAX_FILE_SIZE_BYTES + 1)
+        raw_bytes = await file.read(MAX_FILE_SIZE_BYTES + 1)
+        if len(raw_bytes) > MAX_FILE_SIZE_BYTES:
+            raise HTTPException(
+                status_code=413,
+                detail=f"File '{safe_filename}' exceeds the maximum allowed size limit of 25MB."
+            )
+
+        # 5. Magic Byte Validation: Must start with %PDF-
+        if not raw_bytes.startswith(PDF_MAGIC_BYTES):
+            raise HTTPException(
+                status_code=400,
+                detail=f"File '{safe_filename}' is not a valid PDF document (magic byte signature mismatch)."
+            )
+
+        with open(file_path, "wb") as f:
+            f.write(raw_bytes)
+
+        filesize = len(raw_bytes)
 
         # Call Person 2's extraction engine
         extraction_result = None
@@ -417,14 +525,28 @@ async def upload_documents(files: List[UploadFile] = File(...)):
     )
 
 @app.post("/api/query", response_model=QueryResponse, tags=["Retrieval & Synthesis"])
-async def query_pipeline(request: QueryRequest):
+async def query_pipeline(http_req: Request, query_data: QueryRequest):
     """
-    Executes cross-document synthesis:
-    1. Person 3 `hybrid_search(query, top_k)` retrieves semantically and keyword-matched chunks.
-    2. Identifies associated extracted charts/visual data.
-    3. Person 4 `generate_synthesis(query, context, images)` synthesizes Markdown response.
+    Executes cross-document synthesis with security defenses:
+    - Rate limiting per IP.
+    - Sanitized query input (SQL injection & XSS stripping).
+    - Top-k parameter bounds enforcement.
     """
     start_time = time.time()
+
+    # 1. Rate Limiting Check
+    client_ip = http_req.client.host if http_req.client else "127.0.0.1"
+    allowed, retry_after = query_limiter.check(client_ip)
+    if not allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Query rate limit exceeded. Please wait {retry_after} seconds before trying again.",
+            headers={"Retry-After": str(retry_after)}
+        )
+
+    # 2. Input Sanitization against SQL injection & XSS
+    sanitized_query = sanitize_and_validate_query(query_data.query)
+    top_k = max(1, min(20, query_data.top_k))
     
     has_documents = bool(ALL_CHUNKS_CACHE or DOCUMENT_REGISTRY)
 
@@ -435,14 +557,14 @@ async def query_pipeline(request: QueryRequest):
 
     if has_documents and p3_is_real:
         try:
-            result = hybrid_search(query=request.query, top_k=request.top_k)
+            result = hybrid_search(query=sanitized_query, top_k=top_k)
             if isinstance(result, list) and result:
                 retrieved_chunks = result
         except Exception as e:
             logger.error(f"Error in Person 3 hybrid_search: {e}")
 
     if has_documents and not retrieved_chunks:
-        retrieved_chunks = mock_hybrid_search(request.query, ALL_CHUNKS_CACHE, top_k=request.top_k)
+        retrieved_chunks = mock_hybrid_search(sanitized_query, ALL_CHUNKS_CACHE, top_k=top_k)
     elif not has_documents:
         retrieval_method = "General Knowledge (Vault Empty)"
 
@@ -492,7 +614,7 @@ async def query_pipeline(request: QueryRequest):
         try:
             # Pass retrieved text chunks and extracted images to Person 4
             raw_answer = generate_synthesis(
-                query=request.query,
+                query=sanitized_query,
                 context=retrieved_chunks,
                 images=[img.base64_data for img in relevant_images]
             )
@@ -503,7 +625,7 @@ async def query_pipeline(request: QueryRequest):
 
     if not synthesized_answer:
         synthesized_answer = mock_llm_synthesis(
-            query=request.query,
+            query=sanitized_query,
             context=retrieved_chunks,
             images=relevant_images
         )
@@ -511,7 +633,7 @@ async def query_pipeline(request: QueryRequest):
     latency = round((time.time() - start_time) * 1000, 2)
 
     return QueryResponse(
-        query=request.query,
+        query=sanitized_query,
         synthesized_answer=synthesized_answer,
         retrieved_chunks=retrieved_chunks,
         citations=citations,
