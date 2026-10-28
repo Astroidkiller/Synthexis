@@ -33,10 +33,10 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stAppViewBlockCont
   color: var(--text-primary) !important;
 }
 
-/* Clean Minimal Header */
-header[data-testid="stHeader"] {
-  background: #ffffff !important;
-  border-bottom: 1px solid var(--border-color) !important;
+/* Hide Streamlit Default Menus and Chrome */
+#MainMenu, header[data-testid="stHeader"], footer, [data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"] {
+  display: none !important;
+  visibility: hidden !important;
 }
 
 /* --- Sidebar Styling --- */

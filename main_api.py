@@ -15,7 +15,7 @@ from datetime import datetime
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel, Field
 
 # Load environment configuration
@@ -254,7 +254,23 @@ def mock_llm_synthesis(query: str, context: List[str], images: List[Any] = None)
 # ==============================================================================
 # API ROUTING ENDPOINTS
 # ==============================================================================
-@app.get("/", tags=["Health"])
+@app.get("/", tags=["UI"], include_in_schema=False)
+def serve_index():
+    index_file = BASE_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    return {
+        "project": "Project Synthexis",
+        "author": "Yashu Seervi (@Astroidkiller)",
+        "status": "Operational",
+        "docs_url": "/docs"
+    }
+
+@app.get("/app", tags=["UI"], include_in_schema=False)
+def serve_app_alias():
+    return serve_index()
+
+@app.get("/api/info", tags=["Health"])
 def root():
     return {
         "project": "Project Synthexis",

@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<title>Synthexis — Multimodal Cross-Document Synthesis</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<style>
+  @layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}
+  ::-webkit-scrollbar{display:none;}
+  mark.search-highlight-active {
+    outline: 2px solid #4b41e1;
+    outline-offset: 1px;
+    box-shadow: 0 0 8px rgba(75, 65, 225, 0.4);
+  }
+  .citation-pill:hover {
+    transform: scale(1.05);
+  }
+</style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "secondary-fixed-dim": "#c3c0ff",
+        "primary-fixed": "#dae2fd",
+        "surface-container-low": "#eff4ff",
+        "surface-tint": "#565e74",
+        "on-surface-variant": "#45464d",
+        "on-primary-fixed": "#131b2e",
+        "outline": "#76777d",
+        "on-background": "#0b1c30",
+        "on-tertiary-fixed": "#002113",
+        "outline-variant": "#c6c6cd",
+        "surface-container-highest": "#d3e4fe",
+        "on-tertiary": "#ffffff",
+        "tertiary-container": "#002113",
+        "on-secondary-fixed-variant": "#3323cc",
+        "error-container": "#ffdad6",
+        "surface-bright": "#f8f9ff",
+        "on-primary-fixed-variant": "#3f465c",
+        "surface-dim": "#cbdbf5",
+        "tertiary-fixed-dim": "#4edea3",
+        "inverse-surface": "#213145",
+        "on-secondary-container": "#fffbff",
+        "tertiary-fixed": "#6ffbbe",
+        "surface-container": "#e5eeff",
+        "surface-container-lowest": "#ffffff",
+        "surface": "#f8f9ff",
+        "secondary-fixed": "#e2dfff",
+        "tertiary": "#000000",
+        "on-error-container": "#93000a",
+        "on-primary": "#ffffff",
+        "inverse-primary": "#bec6e0",
+        "on-tertiary-container": "#009668",
+        "on-secondary-fixed": "#0f0069",
+        "background": "#f8f9ff",
+        "secondary": "#4b41e1",
+        "on-primary-container": "#7c839b",
+        "error": "#ba1a1a",
+        "on-tertiary-fixed-variant": "#005236",
+        "inverse-on-surface": "#eaf1ff",
+        "primary-container": "#131b2e",
+        "surface-variant": "#d3e4fe",
+        "primary": "#000000",
+        "on-error": "#ffffff",
+        "on-surface": "#0b1c30",
+        "surface-container-high": "#dce9ff",
+        "on-secondary": "#ffffff",
+        "primary-fixed-dim": "#bec6e0",
+        "secondary-container": "#645efb"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+      },
+      "spacing": {
+        "gutter": "1rem",
+        "space-xs": "0.25rem",
+        "space-lg": "1rem",
+        "space-sm": "0.5rem",
+        "space-md": "0.75rem",
+        "margin": "1.5rem",
+        "space-xl": "1.5rem"
+      },
+      "fontFamily": {
+        "body-lg": ["Inter"],
+        "body-sm": ["Inter"],
+        "mono-citation": ["JetBrains Mono"],
+        "headline-lg": ["Geist"],
+        "headline-md": ["Geist"],
+        "headline-sm": ["Geist"],
+        "label-sm": ["Inter"],
+        "display-lg": ["Geist"],
+        "label-md": ["Inter"],
+        "mono-code": ["JetBrains Mono"],
+        "display-lg-mobile": ["Geist"],
+        "mono-metric": ["JetBrains Mono"],
+        "body-md": ["Inter"]
+      },
+      "fontSize": {
+        "body-lg": ["15px", {"lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400"}],
+        "body-sm": ["12px", {"lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400"}],
+        "mono-citation": ["11px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+        "headline-sm": ["16px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+        "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+        "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "600"}],
+        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+        "mono-code": ["12px", {"lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+        "display-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+        "mono-metric": ["10px", {"lineHeight": "12px", "letterSpacing": "0.04em", "fontWeight": "500"}],
+        "body-md": ["13px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}]
+      }
+    }
+  }
+}
+</script>
+</head>
+<body class="bg-surface font-body-md text-body-md text-on-surface antialiased overflow-x-hidden">
+
+<!-- TOP HEADER -->
+<header class="fixed top-0 left-0 right-0 z-50 h-16 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+  <div class="h-16 w-full px-margin flex items-center justify-between">
+    <div class="flex items-center gap-space-md">
+      <span class="font-headline-sm text-headline-sm font-bold tracking-tight text-primary">SYNTHEXIS</span>
+    </div>
+    <div class="flex items-center gap-space-lg">
+      <div class="hidden sm:flex items-center gap-space-xs font-mono-metric text-mono-metric text-on-tertiary-container bg-surface-container-low px-space-sm py-1 rounded" id="header-api-status">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary-fixed-dim opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-on-tertiary-container"></span>
+        </span>
+        <span id="api-status-text">API Connected (FastAPI)</span>
+      </div>
+      
+      <!-- Interactive Search Trigger & Spotlight Palette Container -->
+      <div class="relative" id="global-search-container">
+        <div class="flex items-center gap-space-sm bg-surface-container-low hover:bg-surface-container focus-within:bg-surface-container-lowest focus-within:ring-2 focus-within:ring-secondary/40 text-on-surface-variant focus-within:text-on-surface px-space-md py-1.5 rounded-lg border border-transparent focus-within:border-secondary transition-all w-80 md:w-[420px] shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+          <span class="material-symbols-outlined text-sm shrink-0 text-on-surface-variant">search</span>
+          <input autocomplete="off" class="w-full bg-transparent border-0 p-0 text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-0" id="global-search-input" placeholder="Search synthesis, docs, evidence (e.g. transformers)..." type="text"/>
+          <!-- In-bar Navigation & Match Count Controls -->
+          <div class="hidden items-center gap-1 shrink-0 pl-1 border-l border-surface-container" id="search-nav-controls">
+            <span class="font-mono-metric text-mono-metric text-secondary font-semibold whitespace-nowrap px-1" id="search-match-count-badge">0 matches</span>
+            <div class="flex items-center">
+              <button class="p-0.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" id="search-prev-btn" title="Previous match (Shift+Enter or ↑)" type="button">
+                <span class="material-symbols-outlined text-base">expand_less</span>
+              </button>
+              <button class="p-0.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" id="search-next-btn" title="Next match (Enter or ↓)" type="button">
+                <span class="material-symbols-outlined text-base">expand_more</span>
+              </button>
+            </div>
+          </div>
+          <button class="text-on-surface-variant hover:text-on-surface p-0.5 rounded transition-colors hidden" id="global-search-clear-btn" title="Clear search (Esc)" type="button">
+            <span class="material-symbols-outlined text-sm">close</span>
+          </button>
+          <kbd class="font-mono-metric text-mono-metric bg-surface-container-lowest border border-outline-variant/40 text-on-surface-variant px-1 rounded shadow-[0_1px_2px_rgba(0,0,0,0.05)] cursor-pointer shrink-0" id="global-search-kbd">⌘K</kbd>
+        </div>
+        
+        <!-- Search Spotlight Dropdown Palette -->
+        <div class="absolute top-full right-0 mt-2 w-[540px] max-w-[94vw] bg-surface-container-lowest rounded-xl shadow-2xl border border-surface-container overflow-hidden z-50 transition-all flex flex-col hidden" id="search-spotlight-palette">
+          <div class="p-space-sm bg-surface-container-low border-b border-surface-container flex items-center justify-between text-on-surface-variant">
+            <div class="flex items-center gap-1.5 overflow-x-auto text-mono-metric font-mono-metric">
+              <button class="search-filter-chip px-2 py-0.5 rounded font-semibold bg-primary text-on-primary" data-category="all" type="button">All (<span id="count-all">0</span>)</button>
+              <button class="search-filter-chip px-2 py-0.5 rounded hover:bg-surface-container text-on-surface-variant transition-colors" data-category="summary" type="button">AI Summary (<span id="count-findings">0</span>)</button>
+              <button class="search-filter-chip px-2 py-0.5 rounded hover:bg-surface-container text-on-surface-variant transition-colors" data-category="doc" type="button">Vault Docs (<span id="count-docs">0</span>)</button>
+              <button class="search-filter-chip px-2 py-0.5 rounded hover:bg-surface-container text-on-surface-variant transition-colors" data-category="artifact" type="button">Evidence (<span id="count-evidence">0</span>)</button>
+            </div>
+            <span class="font-mono-metric text-mono-metric text-on-surface-variant hidden sm:inline">ESC to dismiss</span>
+          </div>
+          <div class="max-h-[380px] overflow-y-auto divide-y divide-surface-container" id="search-results-list"></div>
+          <div class="px-space-md py-2 bg-surface-container-low border-t border-surface-container flex items-center justify-between font-mono-metric text-mono-metric text-on-surface-variant">
+            <div class="flex items-center gap-3">
+              <span><kbd class="px-1 py-0.5 bg-surface-container-lowest rounded border border-outline-variant/30">↑↓</kbd> navigate</span>
+              <span><kbd class="px-1 py-0.5 bg-surface-container-lowest rounded border border-outline-variant/30">↵</kbd> jump to match</span>
+            </div>
+            <span class="text-secondary font-medium">Synthexis Live Spotlight</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- LEFT NAVIGATION RAIL -->
+<aside class="fixed left-0 top-16 bottom-0 w-64 bg-surface-container-low z-40 flex flex-col justify-between p-space-md">
+  <div class="flex flex-col gap-space-md">
+    <div class="px-space-sm py-space-xs font-mono-metric text-mono-metric uppercase text-on-surface-variant tracking-wider">Workspace Corpus</div>
+    <nav class="flex flex-col gap-1">
+      <a aria-current="page" class="flex items-center gap-space-sm px-space-sm py-2 transition-colors bg-primary-container text-on-primary-container font-semibold rounded" href="#">
+        <span class="material-symbols-outlined text-lg">hub</span>Synthesis Canvas
+      </a>
+      <a class="flex items-center gap-space-sm px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" href="#" onclick="toggleLeftVault(false); return false;">
+        <span class="material-symbols-outlined text-lg">source</span>Document Vault
+      </a>
+      <a class="flex items-center gap-space-sm px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" href="#" onclick="toggleRightEvidence(false); switchRightTab('chunks'); return false;">
+        <span class="material-symbols-outlined text-lg">view_in_ar</span>Vector Chunks
+      </a>
+      <a class="flex items-center gap-space-sm px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" href="#" onclick="toggleRightEvidence(false); switchRightTab('visual'); return false;">
+        <span class="material-symbols-outlined text-lg">analytics</span>Visual Figures
+      </a>
+    </nav>
+  </div>
+  <div class="flex flex-col gap-1 pt-space-md">
+    <a class="flex items-center gap-space-sm px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" href="/docs" target="_blank">
+      <span class="material-symbols-outlined text-lg">api</span>FastAPI Swagger
+    </a>
+    <div class="px-space-sm py-space-xs flex items-center justify-between text-on-surface-variant font-mono-metric text-mono-metric">
+      <span>Latency p95</span>
+      <span class="text-on-tertiary-container" id="sidebar-latency-val">Ready</span>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN APP BODY -->
+<div class="pl-64">
+  <main class="w-full pt-16 bg-surface min-h-screen">
+    <div class="flex flex-col lg:flex-row w-full min-h-[calc(100vh-4rem)] bg-surface text-on-surface">
+      
+      <!-- LEFT PANEL: Collapsible Document Vault -->
+      <aside class="w-full lg:w-[280px] shrink-0 bg-surface-container-lowest shadow-sm flex flex-col justify-between transition-all duration-300 relative border-r border-surface-container lg:h-[calc(100vh-4rem)]" id="left-vault-panel">
+        
+        <!-- Collapsed Bar Trigger -->
+        <div class="hidden flex-col items-center py-space-md gap-space-md h-full w-full" id="left-vault-collapsed-bar">
+          <button class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors flex items-center justify-center" id="vault-expand-btn" title="Expand Document Vault">
+            <span class="material-symbols-outlined text-base">chevron_right</span>
+          </button>
+          <button class="flex-1 flex flex-col items-center justify-center gap-2 group w-full py-4 text-on-surface-variant hover:text-on-surface transition-colors" id="vault-vertical-label-btn" title="Expand Document Vault">
+            <span class="font-mono-metric text-mono-metric uppercase tracking-wider [writing-mode:vertical-rl] rotate-180 flex items-center gap-2">
+              <span class="material-symbols-outlined text-xs">folder_open</span> Document Vault
+              <span class="font-mono-metric text-mono-metric bg-surface-container group-hover:bg-primary group-hover:text-on-primary text-on-surface px-1.5 py-0.5 rounded font-semibold transition-colors" id="vault-collapsed-count">0</span>
+            </span>
+          </button>
+        </div>
+
+        <!-- Expanded Panel Content -->
+        <div class="flex flex-col gap-space-md h-full justify-between p-space-md overflow-y-auto" id="left-vault-expanded-content">
+          <div class="flex flex-col gap-space-md">
+            
+            <!-- Vault Header -->
+            <div class="flex items-center justify-between pb-space-xs border-b border-surface-container">
+              <div class="flex items-center gap-space-xs">
+                <span class="font-headline-sm text-headline-sm text-primary font-semibold tracking-tight">Document Vault</span>
+                <span class="font-mono-metric text-mono-metric bg-surface-container text-on-surface px-1.5 py-0.5 rounded font-semibold" id="vault-header-count">0</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <button class="font-label-sm text-label-sm text-on-surface-variant hover:text-error transition-colors px-1.5 py-0.5 rounded" id="vault-clear-btn" type="button">
+                  Clear
+                </button>
+                <button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" id="toggle-vault-btn" title="Collapse Document Vault">
+                  <span class="material-symbols-outlined text-base" id="vault-chevron-icon">chevron_left</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Real Document List (Dynamically updated) -->
+            <div class="flex flex-col gap-space-sm" id="vault-doc-list">
+              <div class="py-4 text-center text-on-surface-variant text-body-sm" id="vault-empty-notice">
+                No documents uploaded yet. Drop a PDF below to begin.
+              </div>
+            </div>
+
+            <!-- Quick Upload Dropzone -->
+            <input type="file" id="pdf-file-input" accept=".pdf" multiple class="hidden" />
+            <div class="flex flex-col items-center justify-center p-space-md rounded-lg bg-surface-container-low hover:bg-surface-container border border-dashed border-outline-variant/60 transition-colors text-center cursor-pointer mt-space-xs" id="upload-dropzone">
+              <div class="p-2 rounded-full bg-surface-container-lowest shadow-sm text-secondary mb-1.5" id="upload-icon-box">
+                <span class="material-symbols-outlined text-xl">upload_file</span>
+              </div>
+              <span class="font-label-md text-label-md text-on-surface font-semibold" id="upload-dropzone-title">Drop PDF papers here</span>
+              <span class="font-mono-metric text-mono-metric text-on-surface-variant mt-0.5" id="upload-dropzone-subtitle">Click to browse or drag & drop</span>
+            </div>
+
+          </div>
+
+          <!-- Bottom Configuration Drawer -->
+          <div class="flex flex-col gap-space-md pt-space-md border-t border-surface-container">
+            <!-- Hybrid Search Balance -->
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-center justify-between font-mono-metric text-mono-metric">
+                <span class="uppercase tracking-wider text-on-surface-variant font-semibold">Retrieval Balance</span>
+                <span class="text-secondary font-semibold" id="retrieval-ratio-label">50% BM25 / 50% Dense</span>
+              </div>
+              <input class="w-full accent-secondary h-1.5 bg-surface-container rounded-lg cursor-pointer" id="retrieval-slider" max="100" min="0" oninput="document.getElementById('retrieval-ratio-label').innerText = `${100 - this.value}% BM25 / ${this.value}% Dense`" type="range" value="50"/>
+              <div class="flex justify-between font-mono-citation text-mono-citation text-on-surface-variant">
+                <span>Lexical (BM25)</span>
+                <span>Semantic (Vectors)</span>
+              </div>
+            </div>
+
+            <!-- Context Depth Slider -->
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-center justify-between font-mono-metric text-mono-metric">
+                <span class="uppercase tracking-wider text-on-surface-variant font-semibold">Context Depth</span>
+                <span class="text-on-surface font-semibold" id="top-k-label">Top-K: 5 chunks</span>
+              </div>
+              <input class="w-full accent-primary h-1.5 bg-surface-container rounded-lg cursor-pointer" id="top-k-slider" max="15" min="1" oninput="document.getElementById('top-k-label').innerText = `Top-K: ${this.value} chunks`" type="range" value="5"/>
+              <div class="flex justify-between font-mono-citation text-mono-citation text-on-surface-variant">
+                <span>Fast (1)</span>
+                <span>Deep Synthesis (15)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CENTRAL WORKSPACE: Query Studio & Synthesis Canvas -->
+      <main class="flex-1 flex flex-col min-w-0 bg-surface lg:h-[calc(100vh-4rem)]">
+        
+        <!-- Top Context & Action Bar -->
+        <div class="px-space-lg py-space-sm bg-surface-container-lowest shadow-sm flex flex-wrap items-center justify-between gap-space-sm border-b border-surface-container">
+          <div class="flex items-center gap-space-sm flex-wrap">
+            <button class="p-1.5 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1 font-label-sm text-label-sm" id="top-vault-toggle-btn" title="Toggle Document Vault">
+              <span class="material-symbols-outlined text-base">side_navigation</span>
+              <span class="hidden xl:inline">Vault</span>
+            </button>
+            <div class="h-4 w-px bg-surface-container mx-0.5"></div>
+            <span class="font-mono-metric text-mono-metric uppercase text-on-surface-variant font-semibold">Active Scope:</span>
+            <div class="flex items-center gap-1 flex-wrap" id="active-scope-container">
+              <span class="inline-flex items-center gap-1.5 font-mono-citation text-mono-citation bg-surface-container text-on-surface px-2 py-1 rounded font-medium border border-surface-container-high">
+                No active document
+              </span>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-space-sm font-mono-metric text-mono-metric">
+            <span class="text-on-tertiary-container bg-surface-container-low border border-on-tertiary-container/20 px-2.5 py-1 rounded flex items-center gap-1 font-medium" id="top-latency-badge">
+              <span class="material-symbols-outlined text-xs">bolt</span>
+              <span id="top-latency-text">Ready • Gemini Multimodal RAG</span>
+            </span>
+            <button class="flex items-center gap-1 px-2.5 py-1 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors font-label-sm text-label-sm" id="export-md-btn" title="Export Markdown">
+              <span class="material-symbols-outlined text-sm">download</span> Markdown
+            </button>
+            <button class="flex items-center gap-1 px-2.5 py-1 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors font-label-sm text-label-sm" id="copy-synthesis-btn" title="Copy Synthesis">
+              <span class="material-symbols-outlined text-sm">content_copy</span> Copy
+            </button>
+            <div class="h-4 w-px bg-surface-container mx-0.5"></div>
+            <button class="p-1.5 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1 font-label-sm text-label-sm" id="top-evidence-toggle-btn" title="Toggle Evidence Inspector">
+              <span class="material-symbols-outlined text-base">dock_to_left</span>
+              <span class="hidden xl:inline">Evidence</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Synthesis Body Area with Scroll -->
+        <div class="flex-1 overflow-y-auto p-space-lg lg:p-space-xl flex flex-col items-center" id="synthesis-scroll-container">
+          <div class="w-full max-w-[840px] flex flex-col gap-space-xl">
+            
+            <!-- Prompt Bar -->
+            <div class="flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container-lowest shadow-md border border-surface-container">
+              <div class="flex items-start gap-space-sm">
+                <span class="material-symbols-outlined text-secondary text-xl mt-1">psychology</span>
+                <textarea class="w-full bg-transparent resize-none focus:outline-none font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant" id="query-textarea" placeholder="Ask cross-corpus questions, synthesize architectural tradeoffs, or extract benchmark tables..." rows="2"></textarea>
+              </div>
+              <div class="flex items-center justify-between pt-space-xs">
+                <div class="flex items-center gap-1.5 overflow-x-auto py-1" id="prompt-preset-bar">
+                  <button class="preset-btn whitespace-nowrap px-2.5 py-1 rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors flex items-center gap-1" data-prompt="Compare the methodologies, architectures, and evaluation approaches used across the documents." type="button">
+                    <span>📊</span> Compare Methodologies
+                  </button>
+                  <button class="preset-btn whitespace-nowrap px-2.5 py-1 rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors flex items-center gap-1" data-prompt="Extract all key benchmark metrics, latency figures, and accuracy scores from the text and charts." type="button">
+                    <span>📈</span> Extract Benchmark Tables
+                  </button>
+                  <button class="preset-btn whitespace-nowrap px-2.5 py-1 rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors flex items-center gap-1" data-prompt="Summarize the architectural diagrams and charts present in the documents, highlighting core tradeoffs." type="button">
+                    <span>🔍</span> Decode Figures & Diagrams
+                  </button>
+                </div>
+                <div class="flex items-center gap-space-sm shrink-0">
+                  <span class="hidden md:inline font-mono-citation text-mono-citation text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded">⌘ Enter</span>
+                  <button class="px-space-md py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-1 transition-all shadow-sm active:scale-95 cursor-pointer" id="synthesize-submit-btn" type="button">
+                    <span id="synthesize-btn-text">Synthesize</span>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Synthesis Canvas Output -->
+            <article class="flex flex-col gap-space-lg bg-surface-container-lowest p-space-xl rounded-xl shadow-sm border border-surface-container" id="synthesis-article-canvas">
+              <div class="flex flex-col gap-space-xs pb-space-md border-b border-surface-container" id="synthesis-header-block">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono-metric text-mono-metric bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 rounded uppercase font-semibold">Evidence Synthesis</span>
+                  <span class="font-mono-metric text-mono-metric text-on-surface-variant" id="synthesis-engine-tag">Gemini Vision Multi-Modal Engine</span>
+                </div>
+                <h1 class="font-display-lg text-display-lg text-primary tracking-tight" id="synthesis-title-heading">Welcome to Synthexis</h1>
+              </div>
+
+              <!-- Main Dynamic Answer Container -->
+              <div class="font-body-lg text-body-lg text-on-surface leading-relaxed space-y-4" id="synthesis-body-container">
+                <p>Upload your research papers, technical specs, or evaluation reports using the <b>Document Vault</b> on the left. Once indexed, type your question above or choose a preset prompt to generate an evidence-grounded comparative synthesis.</p>
+              </div>
+            </article>
+
+          </div>
+        </div>
+      </main>
+
+      <!-- RIGHT PANEL: Multimodal Visual Evidence & Source Inspector -->
+      <aside class="w-full shrink-0 bg-surface-container-lowest shadow-sm flex flex-col h-auto lg:h-[calc(100vh-4rem)] transition-all duration-300 relative border-l border-surface-container lg:w-[48px]" id="right-evidence-panel">
+        
+        <!-- Collapsed Bar Trigger -->
+        <div class="flex-col items-center py-space-md gap-space-md h-full w-full flex" id="right-evidence-collapsed-bar">
+          <button class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors flex items-center justify-center" id="evidence-expand-btn" title="Expand Evidence Inspector">
+            <span class="material-symbols-outlined text-base">chevron_left</span>
+          </button>
+          <button class="flex-1 flex flex-col items-center justify-center gap-2 group w-full py-4 text-on-surface-variant hover:text-on-surface transition-colors" id="evidence-vertical-label-btn" title="Expand Evidence Inspector">
+            <span class="font-mono-metric text-mono-metric uppercase tracking-wider [writing-mode:vertical-rl] flex items-center gap-2">
+              <span class="material-symbols-outlined text-xs">travel_explore</span> Evidence Inspector
+              <span class="font-mono-metric text-mono-metric bg-surface-container group-hover:bg-secondary group-hover:text-on-secondary text-on-surface px-1.5 py-0.5 rounded font-semibold transition-colors" id="evidence-collapsed-count">0</span>
+            </span>
+          </button>
+        </div>
+
+        <!-- Expanded Panel Content -->
+        <div class="flex flex-col h-full overflow-hidden hidden" id="right-evidence-expanded-content">
+          <div class="flex items-center justify-between p-space-sm border-b border-surface-container bg-surface-container-low gap-2">
+            <div class="flex flex-1 bg-surface-container p-0.5 rounded-lg gap-1">
+              <button class="flex-1 py-1.5 text-center font-label-md text-label-md rounded text-on-surface-variant hover:text-on-surface transition-all font-medium" id="tab-btn-visual" type="button">
+                Visuals (<span id="count-visuals-tab">0</span>)
+              </button>
+              <button class="flex-1 py-1.5 text-center font-label-md text-label-md rounded bg-surface-container-lowest text-primary font-semibold shadow-sm transition-all" id="tab-btn-chunks" type="button">
+                Chunks (<span id="count-chunks-tab">0</span>)
+              </button>
+            </div>
+            <button class="p-1.5 rounded-lg hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors shrink-0" id="toggle-evidence-btn" title="Collapse Evidence Inspector">
+              <span class="material-symbols-outlined text-base" id="evidence-chevron-icon">chevron_left</span>
+            </button>
+          </div>
+
+          <!-- Tab Content Area -->
+          <div class="flex-1 overflow-y-auto p-space-md flex flex-col gap-space-md" id="right-panel-content">
+            <!-- VISUAL TAB CONTENT -->
+            <div class="flex-col gap-space-md hidden" id="visual-tab-view">
+              <div class="py-6 text-center text-on-surface-variant text-body-sm" id="visual-empty-notice">No visual diagrams extracted yet.</div>
+            </div>
+
+            <!-- CHUNKS TAB CONTENT -->
+            <div class="flex-col gap-space-md flex" id="chunks-tab-view">
+              <div class="py-6 text-center text-on-surface-variant text-body-sm" id="chunks-empty-notice">No context chunks retrieved yet.</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+</div>
+
+<!-- ============================================================================== -->
+<!-- JAVASCRIPT: PANEL STATE, API INTEGRATION & SPOTLIGHT SEARCH                     -->
+<!-- ============================================================================== -->
+<script>
+  let vaultCollapsed = false;
+  let evidenceCollapsed = true;
+  let SEARCH_CORPUS_ITEMS = [];
+  let currentSearchCategory = 'all';
+  let activePaletteIndex = 0;
+  let inPageMatchElements = [];
+  let currentInPageIndex = -1;
+  let activeDocuments = [];
+  let latestRawSynthesis = "";
+
+  // --- PANEL TOGGLES ---
+  function toggleLeftVault(forceState) {
+    const panel = document.getElementById('left-vault-panel');
+    const expandedContent = document.getElementById('left-vault-expanded-content');
+    const collapsedBar = document.getElementById('left-vault-collapsed-bar');
+    const chevronIcon = document.getElementById('vault-chevron-icon');
+
+    vaultCollapsed = (typeof forceState === 'boolean') ? forceState : !vaultCollapsed;
+
+    if (vaultCollapsed) {
+      panel.classList.remove('lg:w-[280px]');
+      panel.classList.add('lg:w-[48px]');
+      expandedContent.classList.add('hidden');
+      collapsedBar.classList.remove('hidden');
+      collapsedBar.classList.add('flex');
+      if (chevronIcon) chevronIcon.innerText = 'chevron_right';
+    } else {
+      panel.classList.remove('lg:w-[48px]');
+      panel.classList.add('lg:w-[280px]');
+      expandedContent.classList.remove('hidden');
+      collapsedBar.classList.add('hidden');
+      collapsedBar.classList.remove('flex');
+      if (chevronIcon) chevronIcon.innerText = 'chevron_left';
+    }
+  }
+
+  function toggleRightEvidence(forceState) {
+    const panel = document.getElementById('right-evidence-panel');
+    const expandedContent = document.getElementById('right-evidence-expanded-content');
+    const collapsedBar = document.getElementById('right-evidence-collapsed-bar');
+    const chevronIcon = document.getElementById('evidence-chevron-icon');
+
+    evidenceCollapsed = (typeof forceState === 'boolean') ? forceState : !evidenceCollapsed;
+
+    if (evidenceCollapsed) {
+      panel.classList.remove('lg:w-[360px]');
+      panel.classList.add('lg:w-[48px]');
+      expandedContent.classList.add('hidden');
+      collapsedBar.classList.remove('hidden');
+      collapsedBar.classList.add('flex');
+      if (chevronIcon) chevronIcon.innerText = 'chevron_left';
+    } else {
+      panel.classList.remove('lg:w-[48px]');
+      panel.classList.add('lg:w-[360px]');
+      expandedContent.classList.remove('hidden');
+      collapsedBar.classList.add('hidden');
+      collapsedBar.classList.remove('flex');
+      if (chevronIcon) chevronIcon.innerText = 'chevron_right';
+    }
+  }
+
+  function switchRightTab(tab) {
+    const visualView = document.getElementById('visual-tab-view');
+    const chunksView = document.getElementById('chunks-tab-view');
+    const visualBtn = document.getElementById('tab-btn-visual');
+    const chunksBtn = document.getElementById('tab-btn-chunks');
+
+    if (tab === 'visual') {
+      visualView.classList.remove('hidden');
+      visualView.classList.add('flex');
+      chunksView.classList.add('hidden');
+      chunksView.classList.remove('flex');
+
+      visualBtn.className = "flex-1 py-1.5 text-center font-label-md text-label-md rounded bg-surface-container-lowest text-primary font-semibold shadow-sm transition-all";
+      chunksBtn.className = "flex-1 py-1.5 text-center font-label-md text-label-md rounded text-on-surface-variant hover:text-on-surface transition-all font-medium";
+    } else {
+      chunksView.classList.remove('hidden');
+      chunksView.classList.add('flex');
+      visualView.classList.add('hidden');
+      visualView.classList.remove('flex');
+
+      chunksBtn.className = "flex-1 py-1.5 text-center font-label-md text-label-md rounded bg-surface-container-lowest text-primary font-semibold shadow-sm transition-all";
+      visualBtn.className = "flex-1 py-1.5 text-center font-label-md text-label-md rounded text-on-surface-variant hover:text-on-surface transition-all font-medium";
+    }
+  }
+
+  function flashTargetElement(el, ringColorClass = 'ring-secondary') {
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('ring-2', ringColorClass, 'transition-all');
+    setTimeout(() => {
+      el.classList.remove('ring-2', ringColorClass);
+    }, 2200);
+  }
+
+  // --- FASTAPI CLIENT CALLS ---
+  const API_BASE = (window.location.protocol.startsWith('http') && window.location.port === '8000') ? '' : 'http://127.0.0.1:8000';
+
+  async function fetchHealthAndDocuments() {
+    try {
+      const hRes = await fetch(API_BASE + '/health');
+      if (hRes.ok) {
+        document.getElementById('api-status-text').innerText = 'API Connected (FastAPI)';
+      }
+    } catch(e) {
+      document.getElementById('api-status-text').innerText = 'Backend Offline';
+    }
+
+    try {
+      const dRes = await fetch(API_BASE + '/api/documents');
+      if (dRes.ok) {
+        const data = await dRes.json();
+        renderDocumentVault(data.documents || []);
+      }
+    } catch(e) {
+      console.warn('Failed to fetch documents:', e);
+    }
+  }
+
+  function renderDocumentVault(docs) {
+    activeDocuments = docs;
+    const docList = document.getElementById('vault-doc-list');
+    const headerCount = document.getElementById('vault-header-count');
+    const collapsedCount = document.getElementById('vault-collapsed-count');
+    const emptyNotice = document.getElementById('vault-empty-notice');
+    const scopeContainer = document.getElementById('active-scope-container');
+
+    headerCount.innerText = docs.length;
+    collapsedCount.innerText = docs.length;
+
+    if (!docs.length) {
+      docList.innerHTML = '<div class="py-4 text-center text-on-surface-variant text-body-sm" id="vault-empty-notice">No documents uploaded yet. Drop a PDF below to begin.</div>';
+      scopeContainer.innerHTML = '<span class="inline-flex items-center gap-1.5 font-mono-citation text-mono-citation bg-surface-container text-on-surface px-2 py-1 rounded font-medium border border-surface-container-high">No active document</span>';
+      return;
+    }
+
+    // Render cards
+    docList.innerHTML = docs.map((doc, idx) => `
+      <div class="group relative p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-all duration-150 cursor-pointer shadow-sm border border-transparent hover:border-surface-container-highest" id="vault-doc-${idx}">
+        <div class="flex items-start gap-space-sm">
+          <div class="p-1.5 bg-error-container text-error rounded flex items-center justify-center shrink-0 mt-0.5">
+            <span class="material-symbols-outlined text-base">picture_as_pdf</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1">
+              <h4 class="font-label-md text-label-md text-on-surface font-semibold truncate" title="${doc.filename}">${doc.filename}</h4>
+              <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container shrink-0" title="Indexed"></span>
+            </div>
+            <p class="font-mono-citation text-mono-citation text-on-surface-variant mt-1 truncate leading-normal">
+              ${(doc.filesize_bytes/1024).toFixed(1)} KB • ${doc.chunk_count} chunks • ${doc.image_count} visuals
+            </p>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    // Render active scope chips
+    scopeContainer.innerHTML = docs.map(d => `
+      <span class="inline-flex items-center gap-1.5 font-mono-citation text-mono-citation bg-surface-container text-on-surface px-2 py-1 rounded font-medium border border-surface-container-high">
+        <span class="material-symbols-outlined text-xs text-on-tertiary-container">check_circle</span>
+        ${d.filename}
+      </span>
+    `).join('<span class="font-mono-metric text-mono-metric text-on-surface-variant">+</span>');
+
+    updateSearchDataset();
+  }
+
+  // --- UPLOAD PIPELINE ---
+  async function handleFileUpload(files) {
+    if (!files || !files.length) return;
+    const dropzoneTitle = document.getElementById('upload-dropzone-title');
+    const dropzoneSub = document.getElementById('upload-dropzone-subtitle');
+    const origTitle = dropzoneTitle.innerText;
+
+    dropzoneTitle.innerText = `Ingesting ${files.length} document(s)...`;
+    dropzoneSub.innerText = 'Extracting text chunks & visual charts...';
+
+    const formData = new FormData();
+    for (let f of files) {
+      formData.append('files', f);
+    }
+
+    try {
+      const res = await fetch(API_BASE + '/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      if (res.ok) {
+        const data = await res.json();
+        dropzoneTitle.innerText = 'Ingestion Complete!';
+        dropzoneSub.innerText = `Indexed ${data.total_chunks} chunks & ${data.total_images} visuals.`;
+        setTimeout(() => {
+          dropzoneTitle.innerText = origTitle;
+          dropzoneSub.innerText = 'Click to browse or drag & drop';
+        }, 3000);
+        await fetchHealthAndDocuments();
+      } else {
+        const errText = await res.text();
+        alert('Upload failed: ' + errText);
+        dropzoneTitle.innerText = origTitle;
+      }
+    } catch (e) {
+      alert('Upload error: ' + e.message);
+      dropzoneTitle.innerText = origTitle;
+    }
+  }
+
+  // --- SYNTHESIZE QUERY ---
+  async function executeSynthesis() {
+    const textarea = document.getElementById('query-textarea');
+    const query = textarea.value.trim();
+    if (!query) {
+      alert('Please enter a question or instruction to synthesize.');
+      return;
+    }
+
+    const topKSlider = document.getElementById('top-k-slider');
+    const topK = parseInt(topKSlider.value, 10) || 5;
+
+    const btnText = document.getElementById('synthesize-btn-text');
+    const submitBtn = document.getElementById('synthesize-submit-btn');
+    const latencyBadgeText = document.getElementById('top-latency-text');
+    const sidebarLatency = document.getElementById('sidebar-latency-val');
+
+    btnText.innerText = 'Synthesizing...';
+    submitBtn.disabled = true;
+    latencyBadgeText.innerText = 'Retrieving & reasoning with Gemini...';
+
+    try {
+      const res = await fetch(API_BASE + '/api/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query, top_k: topK })
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        alert('Query failed: ' + err);
+        return;
+      }
+
+      const data = await res.json();
+      latestRawSynthesis = data.synthesized_answer;
+
+      // Update Latency Badges
+      const latencySec = (data.latency_ms / 1000).toFixed(2);
+      latencyBadgeText.innerText = `${latencySec}s • ${data.synthesis_engine || 'Gemini Vision'}`;
+      if (sidebarLatency) sidebarLatency.innerText = `${Math.round(data.latency_ms)}ms`;
+
+      // Update Canvas Header
+      document.getElementById('synthesis-title-heading').innerText = query.length > 80 ? query.slice(0, 80) + '...' : query;
+      document.getElementById('synthesis-engine-tag').innerText = `${data.retrieval_method} • ${data.synthesis_engine}`;
+
+      // Render Answer with Interactive Citation Badges
+      renderSynthesizedMarkdown(data.synthesized_answer);
+
+      // Render Visual Evidence in Right Drawer
+      renderVisualEvidence(data.images || []);
+
+      // Render Chunks Evidence in Right Drawer
+      renderChunksEvidence(data.retrieved_chunks || [], data.citations || []);
+
+      // Update Right Drawer Counts
+      document.getElementById('count-visuals-tab').innerText = (data.images || []).length;
+      document.getElementById('count-chunks-tab').innerText = (data.retrieved_chunks || []).length;
+      document.getElementById('evidence-collapsed-count').innerText = ((data.images || []).length + (data.retrieved_chunks || []).length);
+
+      // Automatically expand Right Evidence Drawer if visuals or chunks returned
+      if (evidenceCollapsed && ((data.images || []).length > 0 || (data.retrieved_chunks || []).length > 0)) {
+        toggleRightEvidence(false);
+      }
+
+      updateSearchDataset();
+
+    } catch (e) {
+      alert('Error during synthesis query: ' + e.message);
+    } finally {
+      btnText.innerText = 'Synthesize';
+      submitBtn.disabled = false;
+    }
+  }
+
+  function renderSynthesizedMarkdown(text) {
+    const container = document.getElementById('synthesis-body-container');
+    if (!text) {
+      container.innerHTML = '<p class="text-on-surface-variant">No answer generated.</p>';
+      return;
+    }
+
+    // Split text into paragraphs
+    const paragraphs = text.split('\n\n');
+    let html = '';
+
+    paragraphs.forEach(p => {
+      let trimmed = p.trim();
+      if (!trimmed) return;
+
+      // Headings
+      if (trimmed.startsWith('### ')) {
+        html += `<h3 class="font-headline-sm text-headline-sm text-primary mt-4 font-semibold">${trimmed.slice(4)}</h3>`;
+      } else if (trimmed.startsWith('## ')) {
+        html += `<h2 class="font-headline-md text-headline-md text-primary mt-4 font-semibold">${trimmed.slice(3)}</h2>`;
+      } else if (trimmed.startsWith('# ')) {
+        html += `<h1 class="font-headline-lg text-headline-lg text-primary mt-4 font-bold">${trimmed.slice(2)}</h1>`;
+      } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        // Bullet points
+        const lines = trimmed.split('\n');
+        html += '<ul class="list-disc pl-5 space-y-1 my-2">';
+        lines.forEach(l => {
+          let item = l.replace(/^[-*]\s+/, '');
+          html += `<li>${formatCitationsAndBold(item)}</li>`;
+        });
+        html += '</ul>';
+      } else {
+        html += `<p class="font-body-lg text-body-lg text-on-surface leading-relaxed">${formatCitationsAndBold(trimmed)}</p>`;
+      }
+    });
+
+    container.innerHTML = html;
+    bindCitationPills();
+  }
+
+  function formatCitationsAndBold(str) {
+    // Bold markdown **text**
+    let formatted = str.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-primary">$1</strong>');
+    // Citations [C1], [C2], [V1], [V2]
+    formatted = formatted.replace(/\[([CV][0-9]+)\]/g, (match, tag) => {
+      return `<button class="citation-pill inline-flex items-center h-5 px-1.5 rounded font-mono-citation text-mono-citation bg-surface-container text-secondary hover:bg-secondary-fixed font-semibold align-baseline mx-0.5 transition-colors cursor-pointer" data-ref="${tag}" type="button">[${tag}]</button>`;
+    });
+    return formatted;
+  }
+
+  function renderVisualEvidence(images) {
+    const visualView = document.getElementById('visual-tab-view');
+    if (!images || !images.length) {
+      visualView.innerHTML = '<div class="py-6 text-center text-on-surface-variant text-body-sm">No visual diagrams detected in the retrieved context.</div>';
+      return;
+    }
+
+    visualView.innerHTML = images.map((img, idx) => {
+      const tag = `V${idx + 1}`;
+      return `
+        <div class="rounded-xl bg-surface-container-low border border-surface-container overflow-hidden hover:shadow-md transition-shadow" id="card-${tag.toLowerCase()}">
+          <div class="p-space-sm bg-surface-container flex items-center justify-between border-b border-surface-container">
+            <div class="flex items-center gap-1.5">
+              <span class="font-mono-citation text-mono-citation font-bold px-1.5 py-0.5 rounded bg-primary text-on-primary">[${tag}]</span>
+              <span class="font-label-sm text-label-sm font-semibold truncate max-w-[190px]" title="${img.source_doc}">${img.source_doc}</span>
+            </div>
+            <span class="font-mono-metric text-mono-metric text-on-surface-variant bg-surface-container-lowest px-1.5 py-0.5 rounded">${img.image_id}</span>
+          </div>
+          <div class="relative w-full h-48 overflow-hidden bg-surface-container-highest flex items-center justify-center p-2">
+            <img class="max-w-full max-h-full object-contain rounded" src="${img.base64_data}" alt="${img.description || 'Extracted Figure'}" />
+          </div>
+          <div class="p-space-sm flex flex-col gap-1 bg-surface-container-lowest">
+            <span class="font-mono-metric text-mono-metric text-on-surface-variant uppercase font-semibold">Multimodal Visual Evidence</span>
+            <p class="font-body-sm text-body-sm text-on-surface leading-relaxed">${img.description || 'Isolated diagram/figure'}</p>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderChunksEvidence(chunks, citations) {
+    const chunksView = document.getElementById('chunks-tab-view');
+    if (!chunks || !chunks.length) {
+      chunksView.innerHTML = '<div class="py-6 text-center text-on-surface-variant text-body-sm">No text chunks retrieved.</div>';
+      return;
+    }
+
+    chunksView.innerHTML = chunks.map((chunk, idx) => {
+      const tag = `C${idx + 1}`;
+      let docTitle = "Document Corpus";
+      if (chunk.startsWith("[") && chunk.includes("]")) {
+        docTitle = chunk.slice(1, chunk.indexOf("]"));
+      }
+      return `
+        <div class="rounded-xl bg-surface-container-low border border-surface-container p-space-sm flex flex-col gap-2 shadow-sm" id="card-${tag.toLowerCase()}">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="font-mono-citation text-mono-citation font-bold px-1.5 py-0.5 rounded bg-primary text-on-primary">[${tag}]</span>
+              <span class="font-label-sm text-label-sm font-semibold truncate max-w-[180px]" title="${docTitle}">${docTitle}</span>
+            </div>
+            <span class="font-mono-metric text-mono-metric text-secondary font-semibold bg-surface-container px-1.5 py-0.5 rounded">Rank #${idx + 1}</span>
+          </div>
+          <p class="font-body-sm text-body-sm text-on-surface bg-surface-container-lowest p-2 rounded leading-relaxed border border-surface-container">
+            ${chunk}
+          </p>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function bindCitationPills() {
+    document.querySelectorAll('.citation-pill').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const ref = btn.getAttribute('data-ref');
+        if (!ref) return;
+
+        if (evidenceCollapsed) {
+          toggleRightEvidence(false);
+        }
+
+        if (ref.startsWith('V')) {
+          switchRightTab('visual');
+          setTimeout(() => {
+            const target = document.getElementById(`card-${ref.toLowerCase()}`);
+            if (target) flashTargetElement(target, 'ring-secondary');
+          }, 150);
+        } else if (ref.startsWith('C')) {
+          switchRightTab('chunks');
+          setTimeout(() => {
+            const target = document.getElementById(`card-${ref.toLowerCase()}`);
+            if (target) flashTargetElement(target, 'ring-primary');
+          }, 150);
+        }
+      });
+    });
+  }
+
+  // --- SPOTLIGHT SEARCH ENGINE ---
+  function updateSearchDataset() {
+    SEARCH_CORPUS_ITEMS = [];
+
+    // Add active synthesis title
+    const titleEl = document.getElementById('synthesis-title-heading');
+    if (titleEl && titleEl.innerText) {
+      SEARCH_CORPUS_ITEMS.push({
+        id: 'syn-title',
+        category: 'summary',
+        categoryLabel: 'AI Summary',
+        title: titleEl.innerText,
+        subtitle: 'Main synthesis heading',
+        targetType: 'canvas',
+        targetId: 'synthesis-title-heading',
+        badge: 'Heading',
+        badgeColor: 'bg-primary text-on-primary',
+        keywords: titleEl.innerText.toLowerCase().split(/\s+/)
+      });
+    }
+
+    // Add active synthesis paragraphs
+    const paragraphs = document.querySelectorAll('#synthesis-body-container p');
+    paragraphs.forEach((p, idx) => {
+      SEARCH_CORPUS_ITEMS.push({
+        id: `syn-p-${idx}`,
+        category: 'summary',
+        categoryLabel: 'AI Summary',
+        title: `Synthesis Section ${idx + 1}`,
+        subtitle: p.innerText.slice(0, 120) + '...',
+        targetType: 'canvas',
+        targetId: 'synthesis-body-container',
+        badge: 'Paragraph',
+        badgeColor: 'bg-secondary-fixed text-on-secondary-fixed',
+        keywords: p.innerText.toLowerCase().split(/\s+/)
+      });
+    });
+
+    // Add documents
+    activeDocuments.forEach((doc, idx) => {
+      SEARCH_CORPUS_ITEMS.push({
+        id: `doc-${idx}`,
+        category: 'doc',
+        categoryLabel: 'Vault Doc',
+        title: doc.filename,
+        subtitle: `${(doc.filesize_bytes/1024).toFixed(1)} KB • ${doc.chunk_count} chunks • ${doc.image_count} visuals`,
+        targetType: 'vault',
+        targetId: `vault-doc-${idx}`,
+        badge: 'PDF',
+        badgeColor: 'bg-error-container text-error',
+        keywords: [doc.filename.toLowerCase()]
+      });
+    });
+
+    // Add visual & chunks
+    document.querySelectorAll('#visual-tab-view > div').forEach((card, idx) => {
+      SEARCH_CORPUS_ITEMS.push({
+        id: `visual-${idx}`,
+        category: 'artifact',
+        categoryLabel: 'Evidence',
+        title: `Figure [V${idx + 1}]`,
+        subtitle: card.innerText.slice(0, 100),
+        targetType: 'evidence-visual',
+        targetId: card.id,
+        badge: `[V${idx+1}]`,
+        badgeColor: 'bg-primary text-on-primary',
+        keywords: ['figure', 'chart', `v${idx+1}`]
+      });
+    });
+
+    document.querySelectorAll('#chunks-tab-view > div').forEach((card, idx) => {
+      SEARCH_CORPUS_ITEMS.push({
+        id: `chunk-${idx}`,
+        category: 'artifact',
+        categoryLabel: 'Evidence',
+        title: `Chunk [C${idx + 1}]`,
+        subtitle: card.innerText.slice(0, 100),
+        targetType: 'evidence-chunk',
+        targetId: card.id,
+        badge: `[C${idx+1}]`,
+        badgeColor: 'bg-secondary text-on-secondary',
+        keywords: ['chunk', `c${idx+1}`]
+      });
+    });
+
+    filterSearchResults();
+  }
+
+  function filterSearchResults() {
+    const input = document.getElementById('global-search-input');
+    const query = (input?.value || '').trim();
+    const queryLower = query.toLowerCase();
+    const clearBtn = document.getElementById('global-search-clear-btn');
+    const kbd = document.getElementById('global-search-kbd');
+
+    if (clearBtn && kbd) {
+      if (query.length > 0) {
+        clearBtn.classList.remove('hidden');
+        kbd.classList.add('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+        kbd.classList.remove('hidden');
+      }
+    }
+
+    let filtered = SEARCH_CORPUS_ITEMS.filter(item => {
+      if (currentSearchCategory !== 'all' && item.category !== currentSearchCategory) return false;
+      if (!queryLower) return true;
+      return item.title.toLowerCase().includes(queryLower) ||
+             item.subtitle.toLowerCase().includes(queryLower) ||
+             item.keywords.some(k => k.includes(queryLower));
+    });
+
+    const countAllEl = document.getElementById('count-all');
+    const countDocsEl = document.getElementById('count-docs');
+    const countFindEl = document.getElementById('count-findings');
+    const countArtEl = document.getElementById('count-evidence');
+
+    if (countAllEl) countAllEl.innerText = filtered.length;
+    if (countDocsEl) countDocsEl.innerText = filtered.filter(x => x.category === 'doc').length;
+    if (countFindEl) countFindEl.innerText = filtered.filter(x => x.category === 'summary').length;
+    if (countArtEl) countArtEl.innerText = filtered.filter(x => x.category === 'artifact').length;
+
+    renderSearchResults(filtered, query);
+  }
+
+  function renderSearchResults(items, query = '') {
+    const list = document.getElementById('search-results-list');
+    if (!list) return;
+
+    if (!items.length) {
+      list.innerHTML = `
+        <div class="py-8 px-4 text-center flex flex-col items-center justify-center text-on-surface-variant">
+          <span class="material-symbols-outlined text-3xl mb-1 text-outline">search_off</span>
+          <p class="font-label-md text-label-md font-semibold text-on-surface">No matching entries found</p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Try searching for keywords in the document or answer</p>
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = items.map((item, idx) => `
+      <div class="search-item group px-space-md py-2.5 flex items-start gap-space-sm cursor-pointer transition-colors ${idx === activePaletteIndex ? 'bg-surface-container' : 'hover:bg-surface-container-low'}" 
+           data-id="${item.id}">
+        <div class="mt-0.5 shrink-0">
+          <span class="font-mono-metric text-mono-metric px-1.5 py-0.5 rounded font-semibold ${item.badgeColor}">${item.badge}</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between gap-2">
+            <h5 class="font-label-md text-label-md text-on-surface font-semibold truncate">${item.title}</h5>
+            <span class="font-mono-citation text-mono-citation text-on-surface-variant shrink-0 uppercase tracking-wider">${item.categoryLabel}</span>
+          </div>
+          <p class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">${item.subtitle}</p>
+        </div>
+        <span class="material-symbols-outlined text-xs text-on-surface-variant group-hover:text-primary shrink-0 mt-1">arrow_outward</span>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.search-item').forEach(el => {
+      el.addEventListener('click', () => {
+        const id = el.getAttribute('data-id');
+        const item = SEARCH_CORPUS_ITEMS.find(x => x.id === id);
+        if (item) executeSearchResultAction(item);
+      });
+    });
+  }
+
+  function executeSearchResultAction(item) {
+    closeSearchPalette();
+    if (item.targetType === 'vault') {
+      if (vaultCollapsed) toggleLeftVault(false);
+      const target = document.getElementById(item.targetId);
+      if (target) flashTargetElement(target, 'ring-secondary');
+    } else if (item.targetType === 'canvas') {
+      const target = document.getElementById(item.targetId);
+      if (target) flashTargetElement(target, 'ring-secondary');
+    } else if (item.targetType === 'evidence-visual') {
+      if (evidenceCollapsed) toggleRightEvidence(false);
+      switchRightTab('visual');
+      setTimeout(() => {
+        const target = document.getElementById(item.targetId);
+        if (target) flashTargetElement(target, 'ring-secondary');
+      }, 150);
+    } else if (item.targetType === 'evidence-chunk') {
+      if (evidenceCollapsed) toggleRightEvidence(false);
+      switchRightTab('chunks');
+      setTimeout(() => {
+        const target = document.getElementById(item.targetId);
+        if (target) flashTargetElement(target, 'ring-primary');
+      }, 150);
+    }
+  }
+
+  function openSearchPalette() {
+    const palette = document.getElementById('search-spotlight-palette');
+    if (palette) {
+      palette.classList.remove('hidden');
+      activePaletteIndex = 0;
+      filterSearchResults();
+    }
+  }
+
+  function closeSearchPalette() {
+    const palette = document.getElementById('search-spotlight-palette');
+    if (palette) palette.classList.add('hidden');
+  }
+
+  // --- INITIALIZATION ---
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchHealthAndDocuments();
+
+    // Vault Toggles
+    document.getElementById('toggle-vault-btn')?.addEventListener('click', () => toggleLeftVault());
+    document.getElementById('vault-expand-btn')?.addEventListener('click', () => toggleLeftVault(false));
+    document.getElementById('vault-vertical-label-btn')?.addEventListener('click', () => toggleLeftVault(false));
+    document.getElementById('top-vault-toggle-btn')?.addEventListener('click', () => toggleLeftVault());
+
+    // Evidence Toggles
+    document.getElementById('toggle-evidence-btn')?.addEventListener('click', () => toggleRightEvidence());
+    document.getElementById('evidence-expand-btn')?.addEventListener('click', () => toggleRightEvidence(false));
+    document.getElementById('evidence-vertical-label-btn')?.addEventListener('click', () => toggleRightEvidence(false));
+    document.getElementById('top-evidence-toggle-btn')?.addEventListener('click', () => toggleRightEvidence());
+
+    // Evidence Tabs
+    document.getElementById('tab-btn-visual')?.addEventListener('click', () => switchRightTab('visual'));
+    document.getElementById('tab-btn-chunks')?.addEventListener('click', () => switchRightTab('chunks'));
+
+    // Upload Dropzone Click & Drag
+    const dropzone = document.getElementById('upload-dropzone');
+    const fileInput = document.getElementById('pdf-file-input');
+    if (dropzone && fileInput) {
+      dropzone.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) handleFileUpload(e.target.files);
+      });
+
+      dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('border-primary', 'bg-surface-container');
+      });
+
+      dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('border-primary', 'bg-surface-container');
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('border-primary', 'bg-surface-container');
+        if (e.dataTransfer.files.length) handleFileUpload(e.dataTransfer.files);
+      });
+    }
+
+    // Vault Clear Action
+    document.getElementById('vault-clear-btn')?.addEventListener('click', async () => {
+      if (confirm('Clear all indexed documents and reset the vault?')) {
+        await fetch(API_BASE + '/api/documents', { method: 'DELETE' });
+        await fetchHealthAndDocuments();
+        document.getElementById('synthesis-body-container').innerHTML = '<p class="text-on-surface-variant">Document vault cleared.</p>';
+      }
+    });
+
+    // Preset Prompt Buttons
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const prompt = btn.getAttribute('data-prompt');
+        const textarea = document.getElementById('query-textarea');
+        if (textarea && prompt) {
+          textarea.value = prompt;
+          textarea.focus();
+        }
+      });
+    });
+
+    // Synthesize Submission
+    document.getElementById('synthesize-submit-btn')?.addEventListener('click', executeSynthesis);
+
+    // Keyboard shortcut: Cmd+Enter / Ctrl+Enter in Textarea
+    document.getElementById('query-textarea')?.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        executeSynthesis();
+      }
+    });
+
+    // Export Markdown
+    document.getElementById('export-md-btn')?.addEventListener('click', () => {
+      if (!latestRawSynthesis) {
+        alert('No synthesis available to export.');
+        return;
+      }
+      const blob = new Blob([latestRawSynthesis], { type: 'text/markdown;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Synthexis-Synthesis-Report.md';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Copy Synthesis
+    document.getElementById('copy-synthesis-btn')?.addEventListener('click', () => {
+      if (!latestRawSynthesis) {
+        alert('No synthesis available to copy.');
+        return;
+      }
+      navigator.clipboard.writeText(latestRawSynthesis).then(() => {
+        const btn = document.getElementById('copy-synthesis-btn');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-outlined text-sm">done</span> Copied!';
+        setTimeout(() => btn.innerHTML = orig, 1800);
+      });
+    });
+
+    // Spotlight Search Events
+    const searchInput = document.getElementById('global-search-input');
+    const searchClearBtn = document.getElementById('global-search-clear-btn');
+    const searchKbd = document.getElementById('global-search-kbd');
+    const searchContainer = document.getElementById('global-search-container');
+    const filterChips = document.querySelectorAll('.search-filter-chip');
+
+    if (searchInput) {
+      searchInput.addEventListener('focus', openSearchPalette);
+      searchInput.addEventListener('input', () => {
+        openSearchPalette();
+        filterSearchResults();
+      });
+
+      searchInput.addEventListener('keydown', (e) => {
+        const items = document.querySelectorAll('#search-results-list .search-item');
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (items.length) {
+            activePaletteIndex = (activePaletteIndex + 1) % items.length;
+            filterSearchResults();
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (items.length) {
+            activePaletteIndex = (activePaletteIndex - 1 + items.length) % items.length;
+            filterSearchResults();
+          }
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (items.length && items[activePaletteIndex]) {
+            const id = items[activePaletteIndex].getAttribute('data-id');
+            const item = SEARCH_CORPUS_ITEMS.find(x => x.id === id);
+            if (item) executeSearchResultAction(item);
+          }
+        } else if (e.key === 'Escape') {
+          closeSearchPalette();
+        }
+      });
+    }
+
+    if (searchClearBtn) {
+      searchClearBtn.addEventListener('click', () => {
+        if (searchInput) {
+          searchInput.value = '';
+          closeSearchPalette();
+          searchInput.focus();
+        }
+      });
+    }
+
+    if (searchKbd) {
+      searchKbd.addEventListener('click', () => {
+        if (searchInput) {
+          searchInput.focus();
+          openSearchPalette();
+        }
+      });
+    }
+
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        filterChips.forEach(c => {
+          c.className = "search-filter-chip px-2 py-0.5 rounded hover:bg-surface-container text-on-surface-variant transition-colors";
+        });
+        chip.className = "search-filter-chip px-2 py-0.5 rounded font-semibold bg-primary text-on-primary";
+        currentSearchCategory = chip.getAttribute('data-category') || 'all';
+        activePaletteIndex = 0;
+        filterSearchResults();
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (searchContainer && !searchContainer.contains(e.target)) {
+        closeSearchPalette();
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (searchInput) {
+          searchInput.focus();
+          openSearchPalette();
+        }
+      } else if (e.key === 'Escape') {
+        closeSearchPalette();
+        if (searchInput) searchInput.blur();
+      }
+    });
+  });
+</script>
+</body>
+</html>
