@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 
-from fastapi import FastAPI, File, UploadFile, HTTPException, Query, status
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, FileResponse
@@ -255,7 +255,15 @@ def mock_llm_synthesis(query: str, context: List[str], images: List[Any] = None)
 # API ROUTING ENDPOINTS
 # ==============================================================================
 @app.get("/", tags=["UI"], include_in_schema=False)
-def serve_index():
+def serve_index(request: Request, view: Optional[str] = None):
+    user_agent = request.headers.get("user-agent", "").lower()
+    is_mobile = any(dev in user_agent for dev in ["mobile", "android", "iphone", "ipad"])
+    
+    if view == "mobile" or (is_mobile and view != "desktop"):
+        mobile_file = BASE_DIR / "mobile.html"
+        if mobile_file.exists():
+            return FileResponse(str(mobile_file))
+
     index_file = BASE_DIR / "index.html"
     if index_file.exists():
         return FileResponse(str(index_file))
@@ -266,9 +274,19 @@ def serve_index():
         "docs_url": "/docs"
     }
 
+@app.get("/mobile", tags=["UI"], include_in_schema=False)
+def serve_mobile_ui():
+    mobile_file = BASE_DIR / "mobile.html"
+    if mobile_file.exists():
+        return FileResponse(str(mobile_file))
+    index_file = BASE_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    return {"message": "Mobile UI template not found"}
+
 @app.get("/app", tags=["UI"], include_in_schema=False)
-def serve_app_alias():
-    return serve_index()
+def serve_app_alias(request: Request, view: Optional[str] = None):
+    return serve_index(request, view=view)
 
 @app.get("/api/info", tags=["Health"])
 def root():
@@ -428,18 +446,14 @@ async def query_pipeline(request: QueryRequest):
     """
     start_time = time.time()
     
-    if not ALL_CHUNKS_CACHE and not DOCUMENT_REGISTRY:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No documents have been indexed yet. Please upload PDF documents first."
-        )
+    has_documents = bool(ALL_CHUNKS_CACHE or DOCUMENT_REGISTRY)
 
     # 1. Retrieval Layer (Person 3)
     p3_is_real = check_callable(hybrid_search)
     retrieved_chunks: List[str] = []
     retrieval_method = "Person 3 Hybrid (BM25 + Vector)" if p3_is_real else "Person 1 Fallback Keyword Search"
 
-    if p3_is_real:
+    if has_documents and p3_is_real:
         try:
             result = hybrid_search(query=request.query, top_k=request.top_k)
             if isinstance(result, list) and result:
@@ -447,8 +461,10 @@ async def query_pipeline(request: QueryRequest):
         except Exception as e:
             logger.error(f"Error in Person 3 hybrid_search: {e}")
 
-    if not retrieved_chunks:
+    if has_documents and not retrieved_chunks:
         retrieved_chunks = mock_hybrid_search(request.query, ALL_CHUNKS_CACHE, top_k=request.top_k)
+    elif not has_documents:
+        retrieval_method = "General Knowledge (Vault Empty)"
 
     # Format citations
     citations: List[Citation] = []

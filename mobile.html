@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<meta content="mobile_tab" name="shell-type"/>
+<title>Synthexis — Mobile Synthesis Workspace</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "on-surface": "#0b1c30",
+        "on-secondary": "#ffffff",
+        "tertiary": "#000000",
+        "surface-container": "#e5eeff",
+        "on-surface-variant": "#45464d",
+        "secondary-container": "#645efb",
+        "tertiary-fixed-dim": "#4edea3",
+        "surface-bright": "#f8f9ff",
+        "inverse-on-surface": "#eaf1ff",
+        "on-background": "#0b1c30",
+        "error": "#ba1a1a",
+        "on-secondary-container": "#fffbff",
+        "on-secondary-fixed-variant": "#3323cc",
+        "secondary": "#4b41e1",
+        "surface-variant": "#d3e4fe",
+        "tertiary-fixed": "#6ffbbe",
+        "surface-tint": "#565e74",
+        "on-primary-container": "#7c839b",
+        "surface": "#f8f9ff",
+        "primary": "#000000",
+        "on-secondary-fixed": "#0f0069",
+        "secondary-fixed": "#e2dfff",
+        "primary-container": "#131b2e",
+        "on-error-container": "#93000a",
+        "on-tertiary": "#ffffff",
+        "on-tertiary-fixed-variant": "#005236",
+        "surface-dim": "#cbdbf5",
+        "surface-container-low": "#eff4ff",
+        "on-primary-fixed-variant": "#3f465c",
+        "on-primary-fixed": "#131b2e",
+        "error-container": "#ffdad6",
+        "primary-fixed": "#dae2fd",
+        "surface-container-high": "#dce9ff",
+        "secondary-fixed-dim": "#c3c0ff",
+        "primary-fixed-dim": "#bec6e0",
+        "surface-container-lowest": "#ffffff",
+        "outline": "#76777d",
+        "inverse-primary": "#bec6e0",
+        "on-primary": "#ffffff",
+        "background": "#f8f9ff",
+        "inverse-surface": "#213145",
+        "surface-container-highest": "#d3e4fe",
+        "tertiary-container": "#002113",
+        "outline-variant": "#c6c6cd",
+        "on-tertiary-fixed": "#002113",
+        "on-tertiary-container": "#009668",
+        "on-error": "#ffffff"
+      },
+      borderRadius: {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+      },
+      spacing: {
+        "space-sm": "0.5rem",
+        "space-lg": "1rem",
+        "space-md": "0.75rem",
+        "gutter": "1rem",
+        "margin": "1.5rem",
+        "space-xs": "0.25rem",
+        "space-xl": "1.5rem"
+      },
+      fontFamily: {
+        "body-md": ["Inter"],
+        "body-lg": ["Inter"],
+        "headline-sm": ["Geist"],
+        "display-lg": ["Geist"],
+        "label-sm": ["Inter"],
+        "mono-code": ["JetBrains Mono"],
+        "body-sm": ["Inter"],
+        "display-lg-mobile": ["Geist"],
+        "mono-metric": ["JetBrains Mono"],
+        "headline-md": ["Geist"],
+        "label-md": ["Inter"],
+        "headline-lg": ["Geist"],
+        "mono-citation": ["JetBrains Mono"]
+      },
+      fontSize: {
+        "body-md": ["13px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+        "body-lg": ["15px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+        "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+        "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+        "mono-code": ["12px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+        "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+        "mono-metric": ["10px", { "lineHeight": "12px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+        "mono-citation": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "600" }]
+      }
+    }
+  }
+}
+</script>
+<style>
+  @layer base {
+    html, body {
+      width: 100vw;
+      min-height: 100dvh;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-overflow-scrolling: touch;
+    }
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+  }
+  ::-webkit-scrollbar { display: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+</head>
+<body class="bg-surface text-on-surface flex flex-col min-h-screen overflow-x-hidden overflow-y-auto">
+
+<!-- TOP HEADER -->
+<header class="fixed top-0 w-full z-40 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/30 pt-safe">
+  <div class="h-14 px-gutter flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="font-headline-sm text-headline-sm tracking-tight text-on-surface font-semibold">SYNTHEXIS</span>
+      <span class="font-mono-metric text-[9px] uppercase px-1.5 py-0.5 rounded bg-surface-container-high text-secondary font-semibold">Mobile</span>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <a href="/" title="Switch to Desktop View" class="text-xs px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-medium inline-flex items-center gap-1 transition-all active:scale-95 border border-outline-variant/20">
+        <span class="material-symbols-outlined text-[15px]">desktop_windows</span>
+        <span class="hidden sm:inline">Desktop</span>
+      </a>
+      <button id="headerHealthBtn" title="Check Backend Status" class="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container active:scale-95 transition-all cursor-pointer">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary-fixed-dim opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-on-tertiary-container"></span>
+        </span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="flex-1 flex flex-col relative w-full pt-14 pb-36 bg-surface overflow-visible">
+
+  <!-- TAB 1: SYNTHESIS TAB VIEW -->
+  <div id="tabViewSynthesis" class="flex flex-col w-full">
+    <!-- Top Section: Scope & Telemetry Header Bar -->
+    <section class="w-full px-gutter pt-3 pb-3 bg-surface-bright border-b border-outline-variant/20 flex flex-col gap-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+      <!-- Active Document Scope (Swipeable Pill Chips) -->
+      <div aria-label="Active Synthesis Scope" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1" id="mobileScopeContainer" role="region">
+        <span class="font-mono-metric text-mono-metric text-on-surface-variant uppercase tracking-wider shrink-0 flex items-center gap-1 font-semibold">
+          <span class="material-symbols-outlined text-[15px] text-secondary">source_notes</span> Scope:
+        </span>
+        <div id="mobileScopeChips" class="flex items-center gap-2">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-full bg-surface-container text-on-surface shrink-0 border border-outline-variant/30 shadow-xs">
+            <span class="material-symbols-outlined text-[15px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            <span class="font-mono-code text-[11px] font-medium tracking-tight">Synthexis Vault Active</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Telemetry & Actions Row -->
+      <div class="flex items-center justify-between text-on-surface-variant pt-0.5">
+        <div class="flex items-center gap-2">
+          <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface-container-low border border-outline-variant/30 text-on-surface">
+            <span class="material-symbols-outlined text-[14px] text-secondary">bolt</span>
+            <span class="font-mono-metric text-mono-metric font-semibold" id="mobileLatencyText">Ready</span>
+          </div>
+          <span class="text-outline-variant text-[11px]">•</span>
+          <span class="font-label-sm text-label-sm text-on-surface-variant font-medium" id="mobileModelName">Gemini Agent</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button aria-label="Copy verified synthesis text" class="inline-flex items-center justify-center gap-1 px-3 py-1.5 min-h-[34px] rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors active:scale-95 cursor-pointer border border-outline-variant/20" id="copySynthesisBtn">
+            <span class="material-symbols-outlined text-[15px]">content_copy</span>
+            <span class="font-label-sm text-label-sm font-semibold">Copy</span>
+          </button>
+          <button aria-label="Share analysis report" class="inline-flex items-center justify-center gap-1 px-3 py-1.5 min-h-[34px] rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors active:scale-95 cursor-pointer border border-outline-variant/20" id="shareSynthesisBtn">
+            <span class="material-symbols-outlined text-[15px]">ios_share</span>
+            <span class="font-label-sm text-label-sm font-semibold">Share</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Query Composer Card Section -->
+    <section class="w-full px-gutter py-3">
+      <div class="bg-surface-container-lowest rounded-xl p-3.5 border border-outline-variant/30 shadow-sm flex flex-col gap-3">
+        <div class="flex items-start gap-2">
+          <span class="material-symbols-outlined text-[20px] text-secondary mt-0.5 shrink-0">neurology</span>
+          <div class="flex-1">
+            <label class="font-mono-metric text-mono-metric uppercase tracking-wider text-on-surface-variant block mb-1 font-semibold" for="synthesisQuery">Retrieval Directive</label>
+            <textarea class="w-full bg-transparent font-body-md text-body-md text-on-surface resize-none focus:outline-none leading-relaxed border-0 p-0 focus:ring-0" id="synthesisQuery" placeholder="Ask anything about your uploaded documents or cross-compare evidence..." rows="2"></textarea>
+          </div>
+        </div>
+
+        <!-- Suggestion Micro Chips -->
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+          <button class="suggestion-chip px-3 py-1.5 min-h-[32px] rounded-full bg-surface-container-low border border-outline-variant/30 text-on-surface font-label-sm text-label-sm shrink-0 hover:bg-surface-container transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer" data-query="Compare attention compute complexity and memory bandwidth bottlenecks">
+            <span class="text-[13px]">📊</span> <span class="font-medium">Compare Attention</span>
+          </button>
+          <button class="suggestion-chip px-3 py-1.5 min-h-[32px] rounded-full bg-surface-container-low border border-outline-variant/30 text-on-surface font-label-sm text-label-sm shrink-0 hover:bg-surface-container transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer" data-query="Give me 5 synonyms of happiness">
+            <span class="text-[13px]">✨</span> <span class="font-medium">Synonyms Query</span>
+          </button>
+          <button class="suggestion-chip px-3 py-1.5 min-h-[32px] rounded-full bg-surface-container-low border border-outline-variant/30 text-on-surface font-label-sm text-label-sm shrink-0 hover:bg-surface-container transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer" data-query="What are the main architectural layers and components?">
+            <span class="text-[13px]">🔍</span> <span class="font-medium">Architecture Overview</span>
+          </button>
+        </div>
+
+        <!-- Action Row: Balanced Badges + Button -->
+        <div class="flex items-center justify-between pt-1 border-t border-outline-variant/20">
+          <div class="flex items-center gap-1.5">
+            <span class="font-mono-metric text-[11px] text-on-surface-variant bg-surface-container-low border border-outline-variant/30 px-2 py-1.5 rounded-md font-medium" id="mobileTopKBadge">top_k: 5</span>
+            <span class="font-mono-metric text-[11px] text-on-surface-variant bg-surface-container-low border border-outline-variant/30 px-2 py-1.5 rounded-md font-medium">temp: 0.2</span>
+          </div>
+          <button class="h-9 min-h-[36px] px-4 rounded-lg bg-primary text-on-primary font-headline-sm text-[13px] inline-flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all hover:bg-primary/90 cursor-pointer" id="runSynthesize">
+            <span class="font-semibold" id="runSynthesizeText">Synthesize</span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Synthesis Output Feed -->
+    <section class="w-full px-gutter flex flex-col gap-4" id="synthesisOutputSection">
+      <!-- Ground Truth Fidelity Indicator Badge -->
+      <div class="flex items-center justify-between">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container text-on-surface border border-outline-variant/30 shadow-xs">
+          <span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim" id="fidelityDot"></span>
+          <span class="font-mono-metric text-mono-metric font-semibold tracking-wider uppercase text-on-surface" id="fidelityBadgeText">LIVE SYNTHESIS FEED</span>
+        </div>
+        <span class="font-mono-citation text-mono-citation text-on-surface-variant font-medium" id="chunkCitationCounter">Ready</span>
+      </div>
+
+      <!-- Main Section Heading -->
+      <div class="flex flex-col gap-1">
+        <h1 class="font-headline-md text-headline-md tracking-tight text-on-surface" id="synthesisHeading">
+          Cross-Document Synthesis Canvas
+        </h1>
+        <p class="font-body-sm text-body-sm text-on-surface-variant" id="synthesisSubtitle">
+          Ask a question or select a preset to analyze ingested documents.
+        </p>
+      </div>
+
+      <!-- Formatted Synthesis Body -->
+      <article class="flex flex-col gap-3 font-body-lg text-body-lg text-on-surface leading-relaxed bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/20 shadow-xs" id="mobileSynthesisArticle">
+        <p class="text-on-surface-variant">
+          Upload PDF documents in the <b>Vault</b> tab to extract text chunks, tables, and visual diagrams. Then type any synthesis inquiry to generate grounded findings with precise citations.
+        </p>
+      </article>
+
+      <!-- Visual Evidence Panel -->
+      <div class="flex flex-col gap-3" id="mobileVisualSection">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px] text-secondary">visibility</span>
+            <h2 class="font-headline-sm text-headline-sm text-on-surface">Extracted Visual Evidence</h2>
+          </div>
+          <span class="font-mono-metric text-mono-metric text-on-surface-variant bg-surface-container px-2 py-0.5 rounded font-semibold" id="mobileVisualCount">0 Figures</span>
+        </div>
+
+        <div class="flex flex-col gap-2.5" id="mobileVisualCardsContainer">
+          <div class="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/30 text-on-surface-variant text-xs text-center">
+            No visual artifacts extracted yet. Upload documents containing diagrams or figures to view them here.
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- TAB 2: VAULT TAB VIEW -->
+  <div id="tabViewVault" class="hidden flex-col w-full px-gutter py-4 gap-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="font-headline-md text-headline-md text-on-surface font-semibold">Document Vault</h1>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">Manage ingested PDFs and vector index</p>
+      </div>
+      <button id="mobileVaultClearBtn" class="px-2.5 py-1 text-xs text-error font-medium rounded-lg bg-error-container/40 hover:bg-error-container transition-colors active:scale-95 border border-error/20">
+        Clear Vault
+      </button>
+    </div>
+
+    <!-- Upload Card -->
+    <div class="bg-surface-container-lowest p-4 rounded-xl border-2 border-dashed border-outline-variant hover:border-secondary transition-all flex flex-col items-center justify-center text-center gap-2 cursor-pointer" id="mobileDropzone">
+      <input type="file" id="mobileFileInput" accept=".pdf" multiple class="hidden">
+      <div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-secondary">
+        <span class="material-symbols-outlined text-2xl">upload_file</span>
+      </div>
+      <div>
+        <span class="font-headline-sm text-sm font-semibold text-on-surface block" id="mobileDropzoneTitle">Upload PDF Documents</span>
+        <span class="font-body-sm text-xs text-on-surface-variant block" id="mobileDropzoneSub">Tap to browse files</span>
+      </div>
+    </div>
+
+    <!-- Document Inventory List -->
+    <div class="flex flex-col gap-2">
+      <span class="font-mono-metric text-mono-metric text-on-surface-variant uppercase tracking-wider font-semibold">Indexed Files (<span id="vaultDocCount">0</span>)</span>
+      <div class="flex flex-col gap-2" id="vaultDocList">
+        <div class="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/20 text-center text-on-surface-variant text-xs">
+          No documents uploaded yet.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: INSPECTOR TAB VIEW -->
+  <div id="tabViewInspector" class="hidden flex-col w-full px-gutter py-4 gap-4">
+    <div>
+      <h1 class="font-headline-md text-headline-md text-on-surface font-semibold">Evidence Inspector</h1>
+      <p class="font-body-sm text-body-sm text-on-surface-variant">Lineage, chunk citations, and cosine ranking</p>
+    </div>
+
+    <div class="flex flex-col gap-2.5" id="inspectorFullList">
+      <div class="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/20 text-center text-on-surface-variant text-xs">
+        Run a synthesis query to inspect retrieved evidence chunks.
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: SETTINGS VIEW -->
+  <div id="tabViewSettings" class="hidden flex-col w-full px-gutter py-4 gap-4">
+    <div>
+      <h1 class="font-headline-md text-headline-md text-on-surface font-semibold">System Settings</h1>
+      <p class="font-body-sm text-body-sm text-on-surface-variant">Diagnostics and configuration</p>
+    </div>
+
+    <div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/30 flex flex-col gap-3">
+      <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
+        <span class="font-body-md text-sm font-medium">Backend Health</span>
+        <span class="font-mono-metric text-xs px-2 py-0.5 rounded bg-surface-container-low text-secondary font-semibold" id="settingsHealthText">Checking...</span>
+      </div>
+      <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
+        <span class="font-body-md text-sm font-medium">Synthesis Engine</span>
+        <span class="font-mono-metric text-xs text-on-surface-variant">Gemini Flash</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="font-body-md text-sm font-medium">Retriever</span>
+        <span class="font-mono-metric text-xs text-on-surface-variant">BM25 + ChromaDB Hybrid</span>
+      </div>
+    </div>
+
+    <div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/30 flex flex-col gap-2">
+      <span class="font-body-md text-sm font-semibold text-on-surface">Switch View</span>
+      <p class="font-body-sm text-xs text-on-surface-variant">You can also access the full multi-pane desktop workspace:</p>
+      <a href="/" class="mt-2 w-full py-2 px-3 rounded-lg bg-primary text-on-primary font-headline-sm text-xs font-semibold text-center block active:scale-95 transition-all">
+        Open Desktop Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- Mobile Evidence Quick-Action Sticky Drawer Bar -->
+  <aside class="fixed bottom-[68px] inset-x-0 z-40 px-gutter pointer-events-none pb-1">
+    <div class="max-w-md mx-auto pointer-events-auto">
+      <div class="bg-surface-container-lowest/95 backdrop-blur-xl border border-outline-variant/40 shadow-lg rounded-full px-3 py-1.5 flex items-center justify-between transition-transform active:scale-[0.99]" id="evidenceBar">
+        <div class="flex items-center gap-2">
+          <div class="flex items-center justify-center w-7 h-7 rounded-full bg-secondary-fixed text-secondary shrink-0">
+            <span class="material-symbols-outlined text-[16px]">verified</span>
+          </div>
+          <div class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface">
+            <span class="font-semibold leading-none" id="barVisualText">0 Visual Figures</span>
+            <span class="text-outline-variant text-[10px] leading-none">•</span>
+            <span class="font-semibold leading-none" id="barCitationText">0 Citations</span>
+          </div>
+        </div>
+        <button class="h-8 min-h-[32px] px-3.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm font-semibold inline-flex items-center justify-center gap-1 active:scale-95 transition-all cursor-pointer shadow-xs hover:bg-primary/90 shrink-0" id="openInspectorSheet">
+          <span>Inspect</span>
+          <span class="material-symbols-outlined text-[15px]">arrow_upward</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Interactive Slide-up Sheet for Source Inspector (Modal overlay) -->
+  <div class="fixed inset-0 z-50 bg-primary/40 backdrop-blur-xs hidden flex-col justify-end transition-opacity duration-200" id="inspectorModal">
+    <div class="bg-surface-container-lowest rounded-t-2xl max-h-[80vh] w-full p-space-lg flex flex-col gap-3 shadow-xl overflow-y-auto pb-safe" id="inspectorPanel">
+      <div class="flex items-center justify-between pb-1 border-b border-outline-variant/20">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-[20px] text-secondary">fact_check</span>
+          <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold" id="modalCitationTitle">Evidence Vector Lineage</h3>
+        </div>
+        <button aria-label="Close Inspector" class="w-9 h-9 min-w-[36px] min-h-[36px] rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 cursor-pointer" id="closeInspectorModal">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+      <div class="bg-surface-container-low rounded-xl p-3 flex flex-col gap-1.5 border border-outline-variant/20">
+        <div class="flex items-center justify-between font-mono-metric text-mono-metric text-on-surface-variant">
+          <span class="font-medium" id="modalDocName">Document: Synthexis Corpus</span>
+          <span class="font-semibold text-secondary" id="modalDocPage">Retrieved Match</span>
+        </div>
+        <p class="font-body-md text-body-md text-on-surface leading-normal select-text" id="modalDocExcerpt">
+          Select any citation or visual figure to view the full grounded evidence.
+        </p>
+      </div>
+      <div class="flex items-center justify-between pt-1">
+        <div class="flex items-center gap-1.5 text-on-tertiary-container font-mono-metric text-mono-metric font-semibold">
+          <span class="material-symbols-outlined text-[15px]">task_alt</span>
+          <span id="modalSimilarityText">Grounded & Verified</span>
+        </div>
+        <button class="px-4 py-2 min-h-[38px] rounded-lg bg-surface-container text-on-surface font-label-sm text-label-sm font-semibold hover:bg-surface-container-high active:scale-95 cursor-pointer border border-outline-variant/20" id="modalDoneBtn">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- BOTTOM NAVIGATION BAR -->
+<nav class="fixed bottom-0 w-full z-40 pb-safe bg-surface/90 backdrop-blur-xl border-t border-outline-variant/30" id="bottomNav">
+  <div class="flex items-center justify-around h-16 px-gutter">
+    <button class="nav-tab-item flex flex-col items-center justify-center w-16 h-12 gap-0.5 transition-colors active:scale-95 cursor-pointer text-secondary font-semibold" data-tab="tabViewSynthesis" aria-current="page">
+      <span class="material-symbols-outlined text-[22px]">neurology</span>
+      <span class="font-label-sm text-[11px] leading-tight">Synthesis</span>
+    </button>
+    <button class="nav-tab-item flex flex-col items-center justify-center w-16 h-12 gap-0.5 hover:text-on-surface transition-colors active:scale-95 cursor-pointer text-on-surface-variant" data-tab="tabViewVault">
+      <span class="material-symbols-outlined text-[22px]">folder_data</span>
+      <span class="font-label-sm text-[11px] leading-tight">Vault</span>
+    </button>
+    <button class="nav-tab-item flex flex-col items-center justify-center w-16 h-12 gap-0.5 hover:text-on-surface transition-colors active:scale-95 cursor-pointer text-on-surface-variant" data-tab="tabViewInspector">
+      <span class="material-symbols-outlined text-[22px]">fact_check</span>
+      <span class="font-label-sm text-[11px] leading-tight">Inspector</span>
+    </button>
+    <button class="nav-tab-item flex flex-col items-center justify-center w-16 h-12 gap-0.5 hover:text-on-surface transition-colors active:scale-95 cursor-pointer text-on-surface-variant" data-tab="tabViewSettings">
+      <span class="material-symbols-outlined text-[22px]">tune</span>
+      <span class="font-label-sm text-[11px] leading-tight">Settings</span>
+    </button>
+  </div>
+</nav>
+
+<!-- LIVE CLIENT SCRIPT -->
+<script>
+(function() {
+  const API_BASE = (window.location.protocol.startsWith('http') && window.location.port === '8000') ? '' : 'http://127.0.0.1:8000';
+
+  let latestSynthesisText = "";
+  let latestCitations = [];
+  let latestImages = [];
+  let activeDocs = [];
+
+  // --- TAB SWITCHING ---
+  const navTabs = document.querySelectorAll('.nav-tab-item');
+  const allTabViews = ['tabViewSynthesis', 'tabViewVault', 'tabViewInspector', 'tabViewSettings'];
+
+  navTabs.forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = tab.getAttribute('data-tab');
+
+      // Update Nav appearance
+      navTabs.forEach(t => {
+        t.classList.remove('text-secondary', 'font-semibold');
+        t.classList.add('text-on-surface-variant');
+        t.removeAttribute('aria-current');
+      });
+      tab.classList.add('text-secondary', 'font-semibold');
+      tab.classList.remove('text-on-surface-variant');
+      tab.setAttribute('aria-current', 'page');
+
+      // Switch view
+      allTabViews.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          if (id === targetId) {
+            el.classList.remove('hidden');
+          } else {
+            el.classList.add('hidden');
+          }
+        }
+      });
+    });
+  });
+
+  // --- INSPECTOR MODAL CONTROLLERS ---
+  const modal = document.getElementById('inspectorModal');
+  const closeBtn = document.getElementById('closeInspectorModal');
+  const modalDoneBtn = document.getElementById('modalDoneBtn');
+  const openSheetBtn = document.getElementById('openInspectorSheet');
+  const modalTitle = document.getElementById('modalCitationTitle');
+  const modalDoc = document.getElementById('modalDocName');
+  const modalPage = document.getElementById('modalDocPage');
+  const modalExcerpt = document.getElementById('modalDocExcerpt');
+  const modalSim = document.getElementById('modalSimilarityText');
+
+  function openInspectorModal(cit, doc, page, excerpt, metric = "Verified Ground Truth") {
+    if (!modal) return;
+    if (modalTitle) modalTitle.textContent = `Evidence Lineage [${cit}]`;
+    if (modalDoc) modalDoc.textContent = `Document: ${doc}`;
+    if (modalPage) modalPage.textContent = `Page ${page || 'Matched'}`;
+    if (modalExcerpt) modalExcerpt.textContent = `"${excerpt}"`;
+    if (modalSim) modalSim.textContent = metric;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+
+  function closeInspector() {
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  if (closeBtn) closeBtn.addEventListener('click', closeInspector);
+  if (modalDoneBtn) modalDoneBtn.addEventListener('click', closeInspector);
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeInspector();
+    });
+  }
+
+  if (openSheetBtn) {
+    openSheetBtn.addEventListener('click', () => {
+      if (latestCitations.length > 0) {
+        const c = latestCitations[0];
+        openInspectorModal(`C${c.chunk_index}`, c.source_doc, '', c.snippet);
+      } else {
+        openInspectorModal('Info', 'Synthexis Workspace', '', 'Upload documents in Vault and run a query to inspect live citations.');
+      }
+    });
+  }
+
+  // --- HEALTH & DOCUMENT VAULT FETCH ---
+  async function fetchHealthAndDocuments() {
+    try {
+      const hRes = await fetch(API_BASE + '/health');
+      if (hRes.ok) {
+        const hData = await hRes.json();
+        document.getElementById('settingsHealthText').textContent = 'Healthy (FastAPI)';
+      }
+    } catch(e) {
+      document.getElementById('settingsHealthText').textContent = 'Offline';
+    }
+
+    try {
+      const dRes = await fetch(API_BASE + '/api/documents');
+      if (dRes.ok) {
+        const dData = await dRes.json();
+        renderVaultDocs(dData.documents || []);
+      }
+    } catch(e) {
+      console.warn('Failed to load documents:', e);
+    }
+  }
+
+  function renderVaultDocs(docs) {
+    activeDocs = docs;
+    const docListEl = document.getElementById('vaultDocList');
+    const docCountEl = document.getElementById('vaultDocCount');
+    const scopeChipsEl = document.getElementById('mobileScopeChips');
+
+    if (docCountEl) docCountEl.textContent = docs.length;
+
+    if (docs.length === 0) {
+      if (docListEl) {
+        docListEl.innerHTML = '<div class="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/20 text-center text-on-surface-variant text-xs">No documents uploaded yet. Tap above to add PDFs.</div>';
+      }
+      if (scopeChipsEl) {
+        scopeChipsEl.innerHTML = '<div class="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-full bg-surface-container text-on-surface shrink-0 border border-outline-variant/30 text-[11px]">No active documents (Vault empty)</div>';
+      }
+      return;
+    }
+
+    // Render Vault List
+    if (docListEl) {
+      docListEl.innerHTML = docs.map(doc => `
+        <div class="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/25 flex items-center justify-between gap-3 shadow-xs">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-secondary shrink-0">
+              <span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+            </div>
+            <div class="flex flex-col min-w-0">
+              <span class="font-headline-sm text-xs font-semibold text-on-surface truncate">${doc.filename}</span>
+              <span class="font-mono-metric text-[10px] text-on-surface-variant">${doc.chunk_count} chunks • ${doc.image_count} visuals</span>
+            </div>
+          </div>
+          <span class="font-mono-metric text-[10px] px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-semibold shrink-0">
+            ${Math.round(doc.filesize_bytes / 1024)} KB
+          </span>
+        </div>
+      `).join('');
+    }
+
+    // Render Scope Chips
+    if (scopeChipsEl) {
+      scopeChipsEl.innerHTML = docs.map(doc => `
+        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-full bg-surface-container text-on-surface shrink-0 border border-outline-variant/30 shadow-xs">
+          <span class="material-symbols-outlined text-[15px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+          <span class="font-mono-code text-[11px] font-medium tracking-tight truncate max-w-[140px]">${doc.filename}</span>
+          <span class="font-mono-metric text-[9px] px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-semibold">${doc.chunk_count}c</span>
+        </div>
+      `).join('');
+    }
+  }
+
+  // --- FILE UPLOAD ---
+  const mobileDropzone = document.getElementById('mobileDropzone');
+  const mobileFileInput = document.getElementById('mobileFileInput');
+  const mobileDropzoneTitle = document.getElementById('mobileDropzoneTitle');
+  const mobileDropzoneSub = document.getElementById('mobileDropzoneSub');
+
+  if (mobileDropzone && mobileFileInput) {
+    mobileDropzone.addEventListener('click', () => mobileFileInput.click());
+
+    mobileFileInput.addEventListener('change', async (e) => {
+      const files = e.target.files;
+      if (!files || !files.length) return;
+
+      const formData = new FormData();
+      for (let f of files) formData.append('files', f);
+
+      mobileDropzoneTitle.textContent = 'Uploading & Indexing...';
+      mobileDropzoneSub.textContent = 'Extracting chunks, tables and diagrams...';
+
+      try {
+        const res = await fetch(API_BASE + '/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          mobileDropzoneTitle.textContent = 'Ingestion Complete!';
+          mobileDropzoneSub.textContent = `Indexed ${data.total_chunks} chunks & ${data.total_images} visuals.`;
+          setTimeout(() => {
+            mobileDropzoneTitle.textContent = 'Upload PDF Documents';
+            mobileDropzoneSub.textContent = 'Tap to browse files';
+          }, 3000);
+          await fetchHealthAndDocuments();
+        } else {
+          alert('Upload failed: ' + (await res.text()));
+          mobileDropzoneTitle.textContent = 'Upload PDF Documents';
+          mobileDropzoneSub.textContent = 'Tap to browse files';
+        }
+      } catch (err) {
+        alert('Upload error: ' + err.message);
+        mobileDropzoneTitle.textContent = 'Upload PDF Documents';
+        mobileDropzoneSub.textContent = 'Tap to browse files';
+      }
+    });
+  }
+
+  // --- CLEAR VAULT ---
+  const clearBtn = document.getElementById('mobileVaultClearBtn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', async () => {
+      if (confirm('Purge all documents and reset the vault?')) {
+        await fetch(API_BASE + '/api/documents', { method: 'DELETE' });
+        await fetchHealthAndDocuments();
+        document.getElementById('mobileSynthesisArticle').innerHTML = '<p class="text-on-surface-variant">Document vault cleared.</p>';
+      }
+    });
+  }
+
+  // --- QUERY SYNTHESIS ---
+  const runBtn = document.getElementById('runSynthesize');
+  const queryBox = document.getElementById('synthesisQuery');
+  const runText = document.getElementById('runSynthesizeText');
+  const latencyText = document.getElementById('mobileLatencyText');
+  const modelNameEl = document.getElementById('mobileModelName');
+  const articleEl = document.getElementById('mobileSynthesisArticle');
+  const visualCardsEl = document.getElementById('mobileVisualCardsContainer');
+  const visualCountEl = document.getElementById('mobileVisualCount');
+  const barVisualText = document.getElementById('barVisualText');
+  const barCitationText = document.getElementById('barCitationText');
+  const inspectorFullList = document.getElementById('inspectorFullList');
+
+  async function executeMobileQuery(queryText) {
+    const query = queryText || (queryBox ? queryBox.value.trim() : '');
+    if (!query) {
+      alert('Please enter a query or select a suggestion chip.');
+      return;
+    }
+
+    if (runText) runText.textContent = 'Synthesizing...';
+    if (runBtn) runBtn.disabled = true;
+    if (latencyText) latencyText.textContent = 'Reasoning...';
+
+    try {
+      const res = await fetch(API_BASE + '/api/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query, top_k: 5 })
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        alert('Query failed: ' + err);
+        return;
+      }
+
+      const data = await res.json();
+      latestSynthesisText = data.synthesized_answer || '';
+      latestCitations = data.citations || [];
+      latestImages = data.images || [];
+
+      // Update telemetry
+      if (latencyText) latencyText.textContent = `${(data.latency_ms / 1000).toFixed(2)}s`;
+      if (modelNameEl) modelNameEl.textContent = data.synthesis_engine || 'Gemini Agent';
+      if (barVisualText) barVisualText.textContent = `${latestImages.length} Visual Figures`;
+      if (barCitationText) barCitationText.textContent = `${latestCitations.length} Citations`;
+
+      // Render Synthesis with formatted citations
+      let formattedHtml = escapeHtml(latestSynthesisText)
+        .replace(/\n\n/g, '</p><p class="mt-2.5">')
+        .replace(/\n/g, '<br/>')
+        .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+
+      // Replace [C1], [C2], [V1], etc. with interactive citation buttons
+      formattedHtml = formattedHtml.replace(/\[(C\d+|V\d+)\]/g, (match, tag) => {
+        return `<button class="mobile-cit-pill inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-secondary/15 border border-secondary/30 text-secondary font-mono-citation text-xs font-bold mx-0.5 active:scale-90 transition-all cursor-pointer" data-tag="${tag}">[${tag}]</button>`;
+      });
+
+      if (articleEl) {
+        articleEl.innerHTML = `<div class="leading-relaxed select-text">${formattedHtml}</div>`;
+      }
+
+      // Attach event listener to dynamic citation pills
+      document.querySelectorAll('.mobile-cit-pill').forEach(pill => {
+        pill.addEventListener('click', (e) => {
+          e.preventDefault();
+          const tag = pill.getAttribute('data-tag');
+          if (tag.startsWith('C')) {
+            const num = parseInt(tag.replace('C', ''), 10);
+            const cit = latestCitations[num - 1] || { source_doc: 'Vault Document', snippet: 'Evidence text chunk.' };
+            openInspectorModal(tag, cit.source_doc, '', cit.snippet);
+          } else if (tag.startsWith('V')) {
+            const num = parseInt(tag.replace('V', ''), 10);
+            const img = latestImages[num - 1] || { source_doc: 'Extracted Figure', description: 'Visual artifact' };
+            openInspectorModal(tag, img.source_doc, '', img.description || 'Extracted diagram from document.');
+          }
+        });
+      });
+
+      // Render Visual Figures
+      if (visualCountEl) visualCountEl.textContent = `${latestImages.length} Figure(s)`;
+      if (visualCardsEl) {
+        if (latestImages.length === 0) {
+          visualCardsEl.innerHTML = '<div class="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/30 text-on-surface-variant text-xs text-center">No visual artifacts found in the retrieved context.</div>';
+        } else {
+          visualCardsEl.innerHTML = latestImages.map((img, idx) => `
+            <div class="bg-surface-container-lowest rounded-xl p-3 border border-outline-variant/30 shadow-xs flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-mono-citation text-xs px-2 py-0.5 rounded bg-secondary/10 border border-secondary/20 text-secondary font-bold">[V${idx + 1}]</span>
+                  <span class="font-headline-sm text-xs text-on-surface font-semibold truncate max-w-[180px]">${img.source_doc}</span>
+                </div>
+                <span class="font-mono-metric text-[9px] px-2 py-0.5 rounded-full bg-tertiary-container text-on-tertiary font-bold">Extracted</span>
+              </div>
+              <div class="w-full rounded-lg overflow-hidden border border-outline-variant/20 bg-surface-container-low max-h-48 flex items-center justify-center">
+                <img src="${img.base64_data}" alt="${img.description}" class="object-contain max-h-48 w-full"/>
+              </div>
+              <div class="flex items-center justify-between text-on-surface-variant text-[11px]">
+                <span class="truncate max-w-[200px]">${img.description || 'Visual diagram'}</span>
+                <button class="text-secondary font-semibold hover:underline" onclick="openInspectorModal('V${idx+1}', '${img.source_doc}', '', '${img.description || 'Figure artifact'}')">Inspect</button>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      // Render Full Inspector Tab List
+      if (inspectorFullList) {
+        inspectorFullList.innerHTML = latestCitations.map(c => `
+          <div class="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/25 flex flex-col gap-1.5 shadow-xs">
+            <div class="flex items-center justify-between font-mono-metric text-xs">
+              <span class="font-bold text-secondary">[C${c.chunk_index}] ${c.source_doc}</span>
+              <span class="text-on-tertiary-container font-semibold">Ranked Match</span>
+            </div>
+            <p class="font-body-md text-xs text-on-surface leading-relaxed select-text">${escapeHtml(c.snippet)}</p>
+          </div>
+        `).join('');
+      }
+
+    } catch (e) {
+      alert('Synthesis error: ' + e.message);
+    } finally {
+      if (runText) runText.textContent = 'Synthesize';
+      if (runBtn) runBtn.disabled = false;
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  if (runBtn) {
+    runBtn.addEventListener('click', () => executeMobileQuery());
+  }
+
+  // Suggestion chips
+  document.querySelectorAll('.suggestion-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const q = chip.getAttribute('data-query');
+      if (queryBox) {
+        queryBox.value = q;
+        queryBox.focus();
+      }
+      executeMobileQuery(q);
+    });
+  });
+
+  // Copy Synthesis
+  const copyBtn = document.getElementById('copySynthesisBtn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      if (!latestSynthesisText) {
+        alert('No synthesis available to copy.');
+        return;
+      }
+      navigator.clipboard?.writeText(latestSynthesisText).then(() => {
+        const orig = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<span class="material-symbols-outlined text-[15px] text-tertiary-container">check</span><span class="font-label-sm text-label-sm font-semibold">Copied</span>';
+        setTimeout(() => copyBtn.innerHTML = orig, 1800);
+      });
+    });
+  }
+
+  // Share button
+  const shareBtn = document.getElementById('shareSynthesisBtn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', () => {
+      if (navigator.share && latestSynthesisText) {
+        navigator.share({
+          title: 'Synthexis Multi-Modal Synthesis',
+          text: latestSynthesisText
+        }).catch(() => {});
+      } else if (latestSynthesisText) {
+        navigator.clipboard?.writeText(latestSynthesisText);
+        alert('Synthesis report copied to clipboard for sharing!');
+      } else {
+        alert('Run a synthesis query first to share.');
+      }
+    });
+  }
+
+  // Initial load
+  fetchHealthAndDocuments();
+})();
+</script>
+
+</body>
+</html>
